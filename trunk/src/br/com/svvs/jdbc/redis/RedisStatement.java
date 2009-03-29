@@ -9,6 +9,7 @@ import java.sql.Statement;
 public class RedisStatement implements Statement {
 	
 	private RedisConnection conn;
+	private RedisResultSet resultSet;
 
 	public RedisStatement(RedisConnection conn) {
 		this.conn = conn;
@@ -49,13 +50,19 @@ public class RedisStatement implements Statement {
 		
 		try {
 			RedisCommandWrapper wrapper = this.extractCommand(sql);
+			
 			String redisMsg = wrapper.cmd.createMsg(wrapper.value);
 			
 			String[] result = wrapper.cmd.parseMsg(this.conn.msgToServer(redisMsg));
 			
+			if(result != null)
+				this.resultSet = new RedisResultSet(result);
+			
 			return true;
 						
 		} catch (RedisParseException e) {
+			throw new SQLException(e);
+		} catch (RedisResultException e) {
 			throw new SQLException(e);
 		}
 	}
@@ -175,8 +182,7 @@ public class RedisStatement implements Statement {
 
 	@Override
 	public ResultSet getResultSet() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return this.resultSet;
 	}
 
 	@Override
@@ -217,7 +223,6 @@ public class RedisStatement implements Statement {
 
 	@Override
 	public boolean isPoolable() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 

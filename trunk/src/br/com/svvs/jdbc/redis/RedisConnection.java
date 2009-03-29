@@ -337,7 +337,7 @@ public class RedisConnection implements java.sql.Connection {
 
 	protected String msgToServer(String redisMsg) throws SQLException {
 
-		this.checkConnection();
+		this.checkConnection(); // check if we can send the message.
 		
 		try {
 			return this.io.sendRaw(redisMsg);

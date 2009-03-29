@@ -9,25 +9,36 @@ public enum RedisProtocol implements RedisMessageHandler {
 		}
 
 		@Override
+		public String[] parseMsg(String msg) throws RedisResultException {
+			return this.digester.parseResultMessage(msg);
+		}
+
+	},
+	GET(new RedisDigester("GET")){
+		@Override
+		public String createMsg(String msg) throws RedisParseException {
+			return this.digester.createSimpleCommand(msg);
+		}
+
+		@Override
 		public String[] parseMsg(String msg) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 	},
-	GET(new RedisDigester("GET")){
+	QUIT(new RedisDigester("QUIT")) {
 		@Override
-		public String createMsg(String msg) {
-			// TODO Auto-generated method stub
-			return null;
+		public String createMsg(String msg) throws RedisParseException {
+			return this.digester.createSingleCommand();
 		}
 
 		@Override
-		public String[] parseMsg(String msg) {
+		public String[] parseMsg(String msg) throws RedisResultException {
 			// TODO Auto-generated method stub
 			return null;
 		}
-
+		
 	};
 
 	// message digester

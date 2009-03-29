@@ -22,15 +22,16 @@ public class RedisSocketIO implements RedisIO {
 	
 	@Override
 	public String sendRaw(String command) throws IOException {
+		
 		this.toServerSocket.write(command);
 		this.toServerSocket.flush();
 		
 		StringBuilder sb = new StringBuilder();
 		
-		while(this.fromServerSocket.ready()) {
-			sb.append(this.fromServerSocket.read());
+		while(this.fromServerSocket.ready()  || sb.length() == 0) {
+			char c = (char) this.fromServerSocket.read();
+			sb.append((char) c);
 		}
-		
 		return sb.toString();
 	}
 
