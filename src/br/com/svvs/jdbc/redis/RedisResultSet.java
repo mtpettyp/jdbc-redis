@@ -24,6 +24,15 @@ import java.util.Map;
 
 public class RedisResultSet implements ResultSet {
 
+	private String[] result;
+	private int position = -1;
+	private int upperLimit;
+	
+	RedisResultSet(String[] result) {
+		this.result     = result;
+		this.upperLimit = result.length - 1;
+	}
+
 	@Override
 	public boolean absolute(int row) throws SQLException {
 		// TODO Auto-generated method stub
@@ -444,14 +453,12 @@ public class RedisResultSet implements ResultSet {
 
 	@Override
 	public String getString(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return this.result[this.position];
 	}
 
 	@Override
 	public String getString(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return this.result[this.position];
 	}
 
 	@Override
@@ -596,8 +603,12 @@ public class RedisResultSet implements ResultSet {
 
 	@Override
 	public boolean next() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		if(this.position < this.upperLimit) {
+			this.position++;
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	@Override
