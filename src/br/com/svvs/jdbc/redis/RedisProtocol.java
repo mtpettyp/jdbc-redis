@@ -21,11 +21,22 @@ public enum RedisProtocol implements RedisMessageHandler {
 		}
 
 		@Override
-		public String[] parseMsg(String msg) {
-			// TODO Auto-generated method stub
-			return null;
+		public String[] parseMsg(String msg) throws RedisResultException {
+			return this.digester.parseResultMessage(msg);
 		}
 
+	},
+	MGET(new RedisDigester("MGET")) {
+		@Override
+		public String createMsg(String msg) throws RedisParseException {
+			return this.digester.createSimpleCommand(msg);
+		}
+
+		@Override
+		public String[] parseMsg(String msg) throws RedisResultException {
+			return this.digester.parseResultMessage(msg);
+		}
+		
 	},
 	QUIT(new RedisDigester("QUIT")) {
 		@Override

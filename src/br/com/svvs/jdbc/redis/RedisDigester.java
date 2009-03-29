@@ -33,10 +33,22 @@ public class RedisDigester {
 		
 	}
 	
+	/**
+	 * Use this for commands that have one or more parameters but we don't have to declare a size afterwards, 
+	 * like <i>GET key</i>,<i>MGET key1 key2 key3</i>.
+	 * @param msg
+	 * @return
+	 * @throws RedisParseException
+	 */
 	public String createSimpleCommand(final String msg) throws RedisParseException {
 		return command + " " + msg + terminator;
 	}
 	
+	/**
+	 * Use this for commands that don't take a parameter, like <i>QUIT</i>
+	 * @return
+	 * @throws RedisParseException
+	 */
 	public String createSingleCommand() throws RedisParseException {
 		return command + " " + terminator;
 	}
@@ -65,22 +77,56 @@ public class RedisDigester {
 	}
 
 	private String[] parseSingleLineReply(final String msg) throws RedisResultException {
-		return new String[]{msg.substring(0, msg.length() - 2)};
+		return new String[]{this.removeTerminator(msg)};
 	}
 
-	private String[] parseInteger(String message) {
+	private String[] parseInteger(final String message) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	private String[] passeMultiBulkData(String message) {
-		// TODO Auto-generated method stub
-		return null;
+	private String[] passeMultiBulkData(final String message) throws RedisResultException {
+		
+		String[] r = message.split(terminator);
+		
+		String[] result;
+		if(r.length > 1) {
+			result = new String[Integer.parseInt(r[0])];
+		} else {
+			throw new RedisResultException("Server replied with invalid multi bulk data size.");
+		}
+		
+		long bytes = 0;
+		int resultIndex = 0;
+		for(int i = 1; i < r.length; i++) {
+			bytes = Long.parseLong(r[i].substring(1));
+			if(bytes == -1L) {
+				result[resultIndex] = null; // empty value
+			} else {
+				result[resultIndex] = r[i + 1];
+				i++;
+			}
+			resultIndex++;
+		}
+		
+		return result;
 	}
 
-	private String[] parseBulkData(String message) {
-		// TODO Auto-generated method stub
-		return null;
+	private String[] parseBulkData(final String message) throws RedisResultException {
+		
+		String[] r = message.split(terminator,2);
+		
+		if(r.length == 1 && Integer.parseInt(this.removeTerminator(r[0])) == -1) {
+			return new String[]{null}; // key not found, null result.
+		} else if (r.length > 1) {
+			return new String[]{this.removeTerminator(r[1])}; // key found
+		} else {
+			throw new RedisResultException("Problem trying to parse bulk reply.");
+		}
+	}
+	
+	private String removeTerminator(final String s) {
+		return s.substring(0,s.length() - 2);
 	}
 
 }
