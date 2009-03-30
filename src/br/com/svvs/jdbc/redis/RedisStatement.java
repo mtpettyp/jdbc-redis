@@ -101,8 +101,25 @@ public class RedisStatement implements Statement {
 
 	@Override
 	public int executeUpdate(String sql) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+
+		try {
+			RedisCommandWrapper wrapper = this.extractCommand(sql);
+			
+			String redisMsg = wrapper.cmd.createMsg(wrapper.value);
+			
+			String[] result = wrapper.cmd.parseMsg(this.conn.msgToServer(redisMsg));
+			
+			if(result != null && result.length == 1) {
+				return Integer.parseInt(result[0]);
+			} else {
+				return 0;
+			}
+						
+		} catch (RedisParseException e) {
+			throw new SQLException(e);
+		} catch (RedisResultException e) {
+			throw new SQLException(e);
+		}
 	}
 
 	@Override
@@ -291,8 +308,8 @@ public class RedisStatement implements Statement {
 		String[] sql_splt = sql.trim().split(" ",2);
 		
 		try {
-			RedisProtocol cmd = RedisProtocol.valueOf(RedisProtocol.class, sql_splt[0]);
-			return new RedisCommandWrapper(cmd, sql_splt[1] == null ? "" : sql_splt[1]);
+			RedisProtocol cmd = RedisProtocol.valueOf(RedisProtocol.class, sql_splt[0].toUpperCase());
+			return new RedisCommandWrapper(cmd, sql_splt.length == 2 ? sql_splt[1] : "");
 		} catch(IllegalArgumentException e) {
 			throw new RedisParseException("Command not recognized.");
 		}

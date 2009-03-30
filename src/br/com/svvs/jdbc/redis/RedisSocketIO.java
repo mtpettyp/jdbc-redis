@@ -23,7 +23,7 @@ public class RedisSocketIO implements RedisIO {
 	@Override
 	public String sendRaw(String command) throws IOException {
 		
-		this.toServerSocket.write(command);
+		this.toServerSocket.write(command.toCharArray());
 		this.toServerSocket.flush();
 		
 		StringBuilder sb = new StringBuilder();
@@ -32,6 +32,7 @@ public class RedisSocketIO implements RedisIO {
 			char c = (char) this.fromServerSocket.read();
 			sb.append((char) c);
 		}
+		
 		return sb.toString();
 	}
 
