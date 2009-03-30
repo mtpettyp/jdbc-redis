@@ -18,7 +18,7 @@ public class RedisGetSetSample {
 		
 		Statement statement = conn.createStatement();
 		
-		int TEST_LOOP = 10;
+		int TEST_LOOP = 10000;
 		
 		long start = System.currentTimeMillis();
 		
