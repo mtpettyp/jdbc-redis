@@ -493,7 +493,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 
 		@Override
 		public String[] parseMsg(String msg) throws RedisResultException {
-			return this.digester.parseResultMessage(msg);
+			return null;
 		}
 	},
 	INFO(new RedisDigester("INFO")){
@@ -515,7 +515,6 @@ public enum RedisProtocol implements RedisMessageHandler {
 
 		@Override
 		public String[] parseMsg(String msg) throws RedisResultException {
-			// TODO Auto-generated method stub
 			return null;
 		}
 		
