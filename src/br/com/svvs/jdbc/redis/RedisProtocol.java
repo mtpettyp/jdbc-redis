@@ -2,7 +2,7 @@ package br.com.svvs.jdbc.redis;
 
 public enum RedisProtocol implements RedisMessageHandler {
 	
-	SET(new RedisDigester("SET")){
+	SET(new RedisSimpleDigester("SET")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createBulkCommand(msg);
@@ -13,7 +13,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	GET(new RedisDigester("GET")){
+	GET(new RedisSimpleDigester("GET")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createSimpleCommand(msg);
@@ -25,7 +25,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 		}
 
 	},
-	MGET(new RedisDigester("MGET")) {
+	MGET(new RedisSimpleDigester("MGET")) {
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createSimpleCommand(msg);
@@ -37,7 +37,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 		}
 		
 	},
-	SETNX(new RedisDigester("SETNX")) {
+	SETNX(new RedisSimpleDigester("SETNX")) {
 
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
@@ -50,7 +50,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 		}
 		
 	},
-	INCR(new RedisDigester("INCR")) {
+	INCR(new RedisSimpleDigester("INCR")) {
 
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
@@ -62,7 +62,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	INCRBY(new RedisDigester("INCRBY")) {
+	INCRBY(new RedisSimpleDigester("INCRBY")) {
 
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
@@ -74,7 +74,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	DECR(new RedisDigester("DECR")) {
+	DECR(new RedisSimpleDigester("DECR")) {
 
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
@@ -86,7 +86,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	DECRBY(new RedisDigester("DECRBY")) {
+	DECRBY(new RedisSimpleDigester("DECRBY")) {
 
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
@@ -98,7 +98,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	EXISTS(new RedisDigester("EXISTS")) {
+	EXISTS(new RedisSimpleDigester("EXISTS")) {
 
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
@@ -110,7 +110,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	DEL(new RedisDigester("DEL")) {
+	DEL(new RedisSimpleDigester("DEL")) {
 
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
@@ -122,7 +122,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	TYPE(new RedisDigester("TYPE")) {
+	TYPE(new RedisSimpleDigester("TYPE")) {
 
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
@@ -134,7 +134,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);		
 		}
 	},
-	KEYS(new RedisDigester("KEYS")) {
+	KEYS(new RedisSimpleDigester("KEYS")) {
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createSimpleCommand(msg);
@@ -152,7 +152,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			}
 		}
 	},
-	RANDOMKEY(new RedisDigester("RANDOMKEY")) {
+	RANDOMKEY(new RedisSimpleDigester("RANDOMKEY")) {
 
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
@@ -164,7 +164,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	RENAME(new RedisDigester("RENAME")) {
+	RENAME(new RedisSimpleDigester("RENAME")) {
 
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
@@ -176,7 +176,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	RENAMENX(new RedisDigester("RENAMENX")) {
+	RENAMENX(new RedisSimpleDigester("RENAMENX")) {
 
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
@@ -188,7 +188,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	DBSIZE(new RedisDigester("DBSIZE")) {
+	DBSIZE(new RedisSimpleDigester("DBSIZE")) {
 
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
@@ -200,7 +200,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	RPUSH(new RedisDigester("RPUSH")){
+	RPUSH(new RedisSimpleDigester("RPUSH")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createBulkCommand(msg);
@@ -212,7 +212,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 		}
 
 	},
-	LPUSH(new RedisDigester("LPUSH")){
+	LPUSH(new RedisSimpleDigester("LPUSH")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createBulkCommand(msg);
@@ -224,7 +224,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 		}
 
 	},
-	LLEN(new RedisDigester("LLEN")){
+	LLEN(new RedisSimpleDigester("LLEN")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createSimpleCommand(msg);
@@ -236,7 +236,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 		}
 
 	},
-	LRANGE(new RedisDigester("LRANGE")){
+	LRANGE(new RedisSimpleDigester("LRANGE")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createSimpleCommand(msg);
@@ -248,7 +248,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 		}
 
 	},
-	LTRIM(new RedisDigester("LTRIM")){
+	LTRIM(new RedisSimpleDigester("LTRIM")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createSimpleCommand(msg);
@@ -260,7 +260,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 		}
 
 	},
-	LINDEX(new RedisDigester("LINDEX")){
+	LINDEX(new RedisSimpleDigester("LINDEX")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createSimpleCommand(msg);
@@ -272,7 +272,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 		}
 
 	},
-	LSET(new RedisDigester("LSET")){
+	LSET(new RedisSimpleDigester("LSET")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createBulkWithParamCommand(msg,1);
@@ -284,7 +284,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 		}
 
 	},
-	LREM(new RedisDigester("LREM")){
+	LREM(new RedisSimpleDigester("LREM")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createBulkWithParamCommand(msg,1);
@@ -296,7 +296,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 		}
 
 	},
-	LPOP(new RedisDigester("LPOP")){
+	LPOP(new RedisSimpleDigester("LPOP")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createSimpleCommand(msg);
@@ -308,7 +308,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 		}
 
 	},
-	RPOP(new RedisDigester("RPOP")){
+	RPOP(new RedisSimpleDigester("RPOP")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createSimpleCommand(msg);
@@ -320,7 +320,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 		}
 
 	},
-	SADD(new RedisDigester("SADD")){
+	SADD(new RedisSimpleDigester("SADD")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createBulkCommand(msg);
@@ -331,7 +331,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	SREM(new RedisDigester("SREM")){
+	SREM(new RedisSimpleDigester("SREM")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createBulkCommand(msg);
@@ -342,7 +342,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	SCARD(new RedisDigester("SCARD")){
+	SCARD(new RedisSimpleDigester("SCARD")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createSimpleCommand(msg);
@@ -353,7 +353,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	SISMEMBER(new RedisDigester("SISMEMBER")){
+	SISMEMBER(new RedisSimpleDigester("SISMEMBER")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createBulkCommand(msg);
@@ -364,7 +364,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	SINTER(new RedisDigester("SINTER")){
+	SINTER(new RedisSimpleDigester("SINTER")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createSimpleCommand(msg);
@@ -375,7 +375,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	SMEMBERS(new RedisDigester("SMEMBERS")){
+	SMEMBERS(new RedisSimpleDigester("SMEMBERS")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createSimpleCommand(msg);
@@ -386,7 +386,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	SINTERSTORE(new RedisDigester("SINTERSTORE")){
+	SINTERSTORE(new RedisSimpleDigester("SINTERSTORE")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createSimpleCommand(msg);
@@ -397,7 +397,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	SELECT(new RedisDigester("SELECT")){
+	SELECT(new RedisSimpleDigester("SELECT")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createSimpleCommand(msg);
@@ -408,7 +408,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	MOVE(new RedisDigester("MOVE")){
+	MOVE(new RedisSimpleDigester("MOVE")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createSimpleCommand(msg);
@@ -419,7 +419,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	FLUSHDB(new RedisDigester("FLUSHDB")){
+	FLUSHDB(new RedisSimpleDigester("FLUSHDB")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createSimpleCommand(msg);
@@ -430,7 +430,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	FLUSHALL(new RedisDigester("FLUSHDB")){
+	FLUSHALL(new RedisSimpleDigester("FLUSHDB")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createSimpleCommand(msg);
@@ -441,7 +441,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	SORT(new RedisDigester("SORT")){
+	SORT(new RedisSimpleDigester("SORT")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createSimpleCommand(msg);
@@ -452,7 +452,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	SAVE(new RedisDigester("SAVE")){
+	SAVE(new RedisSimpleDigester("SAVE")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createSimpleCommand(msg);
@@ -463,7 +463,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	BGSAVE(new RedisDigester("BGSAVE")){
+	BGSAVE(new RedisSimpleDigester("BGSAVE")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createSimpleCommand(msg);
@@ -474,7 +474,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	LASTSAVE(new RedisDigester("LASTSAVE")){
+	LASTSAVE(new RedisSimpleDigester("LASTSAVE")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createSimpleCommand(msg);
@@ -485,7 +485,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	SHUTDOWN(new RedisDigester("SHUTDOWN")){
+	SHUTDOWN(new RedisSimpleDigester("SHUTDOWN")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createSimpleCommand(msg);
@@ -496,7 +496,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return null;
 		}
 	},
-	INFO(new RedisDigester("INFO")){
+	INFO(new RedisSimpleDigester("INFO")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createSimpleCommand(msg);
@@ -507,7 +507,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return this.digester.parseResultMessage(msg);
 		}
 	},
-	QUIT(new RedisDigester("QUIT")) {
+	QUIT(new RedisSimpleDigester("QUIT")) {
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
 			return this.digester.createSimpleCommand(msg);
