@@ -18,7 +18,7 @@ public interface RedisDigester {
 	public abstract String[] parseResultMessage(final String msg)
 			throws RedisResultException;
 
-	public abstract String createBulkWithParamCommand(String msg, int i)
+	public abstract String createBulkCommand(String msg, int i)
 			throws RedisParseException;
 
 }

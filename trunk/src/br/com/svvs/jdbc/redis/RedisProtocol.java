@@ -275,7 +275,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 	LSET(new RedisSimpleDigester("LSET")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
-			return this.digester.createBulkWithParamCommand(msg,1);
+			return this.digester.createBulkCommand(msg,1);
 		}
 
 		@Override
@@ -287,7 +287,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 	LREM(new RedisSimpleDigester("LREM")){
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
-			return this.digester.createBulkWithParamCommand(msg,1);
+			return this.digester.createBulkCommand(msg,1);
 		}
 
 		@Override
