@@ -126,7 +126,7 @@ public class RedisSimpleDigester implements RedisDigester {
 	/* (non-Javadoc)
 	 * @see br.com.svvs.jdbc.redis.RedisDigesterI#createBulkWithParamCommand(java.lang.String, int)
 	 */
-	public String createBulkWithParamCommand(String msg, int i) throws RedisParseException {
+	public String createBulkCommand(String msg, int i) throws RedisParseException {
 		
 		String[] s = msg.trim().split(" ",i - 1);
 		
