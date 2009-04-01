@@ -23,14 +23,12 @@ The current specification of Redis have three groups of commands; *bulk commands
 
 Here's a class diagram of JDBC-Redis:
 
-<table style="width:auto;"><tr><td><a href="http://picasaweb.google.com/lh/photo/HqcMSvgbK8T2dA93xr71-w?feat=embedwebsite"><img src="http://lh5.ggpht.com/_UFTS2NrETHg/SdGRz7tMDVI/AAAAAAAAALA/UntsXhrHSVc/s400/JDBC-Redis_Class_Diagram.jpg" /></a></td></tr><tr><td style="font-family:arial,sans-serif; font-size:11px; text-align:right">From <a href="http://picasaweb.google.com/mavcunha/JDBCRedis?feat=embedwebsite">JDBC-Redis</a></td></tr></table>
+<table style="width:auto;"><tr><td><a href="http://picasaweb.google.com/lh/photo/ZV2rxO29ctQ3fgOUuYNGZQ?feat=embedwebsite"><img src="http://lh4.ggpht.com/_UFTS2NrETHg/SdLjELJxV-I/AAAAAAAAAMU/h1PuTJRiAlk/s144/JDBC-Redis_Class_Diagram.jpg" /></a></td></tr><tr><td style="font-family:arial,sans-serif; font-size:11px; text-align:right">From <a href="http://picasaweb.google.com/mavcunha/JDBCRedis?feat=embedwebsite">JDBC-Redis</a></td></tr></table>
 
 JDBC-Redis uses a Java enumeration to define all Redis commands, for each element in this enumeration we implement the `RedisMessageHandler` interface that has two methods; `createMsg(String msg)` and `parseMsg(String msg)`. A SQL like string, for example `set key value`, should be convert to a Redis formatted message, which in this example is `set key 5\r\nvalue\r\n`. A response from Redis will be sent to `parseMsg(String msg)` and converted in String array, this array will be the basis for `RedisResultSet`. `RedisResultSet` takes a String array and convert it's elements as the client calls to get each line returned.
 
 For a simple view how a message is handled here is a sequence diagram:
 
-<table style="width:auto;"><tr><td><a href="http://picasaweb.google.com/lh/photo/-gbZDmPiAVS_JqKAboHuSg?feat=embedwebsite"><img src="http://lh5.ggpht.com/_UFTS2NrETHg/SdGRzOUXj3I/AAAAAAAAAK8/Q2uWwOqWUKY/s400/JDBC-Redis_Message_Parsing.jpg" /></a></td></tr><tr><td style="font-family:arial,sans-serif; font-size:11px; text-align:right">From <a href="http://picasaweb.google.com/mavcunha/JDBCRedis?feat=embedwebsite">JDBC-Redis</a></td></tr></table>
-
-
+<table style="width:auto;"><tr><td><a href="http://picasaweb.google.com/lh/photo/vt9xQ3WvfNSlLdVu3JKOKQ?feat=embedwebsite"><img src="http://lh4.ggpht.com/_UFTS2NrETHg/SdLjE3m-KXI/AAAAAAAAAMY/E2Blz_HL9rI/s144/JDBC-Redis_Message_Parsing.jpg" /></a></td></tr><tr><td style="font-family:arial,sans-serif; font-size:11px; text-align:right">From <a href="http://picasaweb.google.com/mavcunha/JDBCRedis?feat=embedwebsite">JDBC-Redis</a></td></tr></table>
 
 
