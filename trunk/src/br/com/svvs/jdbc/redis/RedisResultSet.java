@@ -14,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.RowId;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.sql.SQLWarning;
 import java.sql.SQLXML;
 import java.sql.Statement;
@@ -89,148 +90,151 @@ public class RedisResultSet implements ResultSet {
 
 	@Override
 	public Array getArray(int i) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public Array getArray(String colName) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public InputStream getAsciiStream(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public InputStream getAsciiStream(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			return new BigDecimal(this.result[this.position]);
+		} catch(NumberFormatException e) {
+			throw new SQLException("Can't convert " + this.result[this.position] + " to BigDecimal.");
+		}
 	}
 
 	@Override
 	public BigDecimal getBigDecimal(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return this.getBigDecimal(0);
 	}
 
 	@Override
 	public BigDecimal getBigDecimal(int columnIndex, int scale)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			return new BigDecimal(this.result[this.position]).setScale(scale);
+		} catch(NumberFormatException e) {
+			throw new SQLException("Can't convert " + this.result[this.position] + " to BigDecimal.");
+		}
 	}
 
 	@Override
 	public BigDecimal getBigDecimal(String columnName, int scale)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return this.getBigDecimal(0, scale);
 	}
 
 	@Override
 	public InputStream getBinaryStream(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public InputStream getBinaryStream(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public Blob getBlob(int i) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public Blob getBlob(String colName) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public boolean getBoolean(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		String r = this.result[this.position];
+		if(r.equals("0")) {
+			return false;
+		} else if (r.equals("1")) {
+			return true;
+		} else {
+			throw new SQLException("Don't know how to convert " + r + " into a boolean.");
+		}
 	}
 
 	@Override
 	public boolean getBoolean(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return this.getBoolean(0);
 	}
 
+	/**
+	 * Will return the first byte of current row value. If the result has more
+	 * bytes only the first will be returned.
+	 */
 	@Override
 	public byte getByte(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		if(this.result[this.position] != null) {
+			return this.result[this.position].getBytes()[0];
+		} else {
+			return 0;
+		}
 	}
 
 	@Override
 	public byte getByte(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.getByte(0);
 	}
 
 	@Override
 	public byte[] getBytes(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		if(this.result[this.position] != null) {
+			return this.result[this.position].getBytes();
+		} else {
+			return null;
+		}
 	}
 
 	@Override
 	public byte[] getBytes(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return this.getBytes(0);
 	}
 
 	@Override
 	public Reader getCharacterStream(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public Reader getCharacterStream(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public Clob getClob(int i) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public Clob getClob(String colName) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public int getConcurrency() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ResultSet.CONCUR_READ_ONLY;
 	}
 
 	@Override
 	public String getCursorName() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
