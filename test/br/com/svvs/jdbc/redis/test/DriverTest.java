@@ -13,7 +13,7 @@ public class DriverTest {
 	@Test
 	public void testLoadDriver() {
 		try {
-			Class.forName("br.com.svvs.jdbc.redis.Driver");
+			Class.forName("br.com.svvs.jdbc.redis.RedisDriver");
 		} catch (ClassNotFoundException e) {
 			fail("Could not load driver!");
 		}
@@ -25,7 +25,7 @@ public class DriverTest {
 			Driver d = DriverManager.getDriver("jdbc:redis:");
 			assertTrue(
 					"Not a instance of br.com.svvs.jdbc.redis.Driver, same URL already registered?", 
-					d instanceof br.com.svvs.jdbc.redis.Driver);
+					d instanceof br.com.svvs.jdbc.redis.RedisDriver);
 		} catch (SQLException e) {
 			fail(e.getMessage());
 		}
@@ -33,7 +33,7 @@ public class DriverTest {
 	
 	@Test
 	public void testAcceptsURL() {
-		Driver d = new br.com.svvs.jdbc.redis.Driver();
+		Driver d = new br.com.svvs.jdbc.redis.RedisDriver();
 		try {
 			assertTrue(
 					"Valid URL returned false!",
@@ -79,22 +79,17 @@ public class DriverTest {
 
 	@Test
 	public void testGetMajorVersion() {
-		assertTrue(new br.com.svvs.jdbc.redis.Driver().getMajorVersion() >= 0);
+		assertTrue(new br.com.svvs.jdbc.redis.RedisDriver().getMajorVersion() >= 0);
 	}
 
 	@Test
 	public void testGetMinorVersion() {
-		assertTrue(new br.com.svvs.jdbc.redis.Driver().getMinorVersion() >= 0);
-	}
-
-	//TODO: implement this test
-	public void testGetPropertyInfo() {
-		fail("Not yet implemented");
+		assertTrue(new br.com.svvs.jdbc.redis.RedisDriver().getMinorVersion() >= 0);
 	}
 
 	@Test
 	public void testJdbcCompliant() {
-		assertFalse(new br.com.svvs.jdbc.redis.Driver().jdbcCompliant());
+		assertFalse(new br.com.svvs.jdbc.redis.RedisDriver().jdbcCompliant());
 	}
 
 }
