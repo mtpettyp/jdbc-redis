@@ -36,4 +36,9 @@ public class RedisSocketIO implements RedisIO {
 		return sb.toString();
 	}
 
+	@Override
+	public void close() throws IOException {
+		this.socket.close();
+	}
+
 }

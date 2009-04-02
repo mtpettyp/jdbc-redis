@@ -3,12 +3,13 @@ package br.com.svvs.jdbc.redis;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class Driver implements java.sql.Driver {
+public class RedisDriver implements Driver {
 	
 	// those are public so user can peek, but all are final.
 	public static final String JDBC_URL = "jdbc:redis:";
@@ -22,7 +23,7 @@ public class Driver implements java.sql.Driver {
 	
 	static {
 		try {
-			DriverManager.registerDriver(new Driver());
+			DriverManager.registerDriver(new RedisDriver());
 		} catch (SQLException e) {
 			throw new RuntimeException("Can't register redis JDBC driver!");
 		}
@@ -51,13 +52,13 @@ public class Driver implements java.sql.Driver {
 				// solve defaults...
 				if(host != null && port != -1 && path != null) {
 					int dbnb = Integer.parseInt(path.substring(1));// FIXME: better handle path parsing.
-					return RedisConnectionFactory.getConnection(host, port, dbnb);
+					return RedisConnectionFactory.getConnection(host, port, dbnb, info);
 				} else if (host != null && port != -1) {
-					return RedisConnectionFactory.getConnection(host, port, DEFAULT_DBNB);
+					return RedisConnectionFactory.getConnection(host, port, DEFAULT_DBNB, info);
 				} else if (host != null) {
-					return RedisConnectionFactory.getConnection(host, DEFAULT_PORT, DEFAULT_DBNB);
+					return RedisConnectionFactory.getConnection(host, DEFAULT_PORT, DEFAULT_DBNB, info);
 				} else {
-					return RedisConnectionFactory.getConnection(DEFAULT_HOST, DEFAULT_PORT, DEFAULT_DBNB);
+					return RedisConnectionFactory.getConnection(DEFAULT_HOST, DEFAULT_PORT, DEFAULT_DBNB, info);
 				}
 					
 			} catch (URISyntaxException e) {
