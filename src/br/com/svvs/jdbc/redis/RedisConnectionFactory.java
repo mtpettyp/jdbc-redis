@@ -4,11 +4,12 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Properties;
 
 public class RedisConnectionFactory {
 
 	public static Connection getConnection(String host, int port,
-			int dbnb) throws SQLException {
+			int dbnb, Properties info) throws SQLException {
 		
 		//TODO: Add support for others RedisIOs
 		RedisIO io;
@@ -20,7 +21,7 @@ public class RedisConnectionFactory {
 			throw new SQLException("Couldn't connect ("+ e.getMessage() + ")");
 		}
 		
-		Connection conn = new RedisConnection(io);		
+		Connection conn = new RedisConnection(io, info);	
 		return conn;
 	}
 

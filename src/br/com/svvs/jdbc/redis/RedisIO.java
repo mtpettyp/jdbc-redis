@@ -5,4 +5,6 @@ import java.io.IOException;
 public interface RedisIO {
 	
 	String sendRaw(String command) throws IOException;
+
+	void close() throws IOException;
 }

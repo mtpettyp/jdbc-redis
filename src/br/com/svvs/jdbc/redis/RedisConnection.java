@@ -5,11 +5,13 @@ import java.sql.Array;
 import java.sql.Blob;
 import java.sql.CallableStatement;
 import java.sql.Clob;
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.NClob;
 import java.sql.PreparedStatement;
 import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.sql.SQLWarning;
 import java.sql.SQLXML;
 import java.sql.Savepoint;
@@ -23,59 +25,92 @@ public class RedisConnection implements java.sql.Connection {
 	private RedisIO io = null;
 	private boolean isClosed = true;
 	
-	public RedisConnection(RedisIO io) {
+	private final String NOT_SUPPORTED = "This operation is not supported by Redis or this driver.";
+	
+	public RedisConnection(RedisIO io, Properties info) throws SQLException {
+		
 		if(io == null)
 			throw new RuntimeException("Null RedisIO handler.");
 		this.io = io;
+
+		// we got a connection, let's try to authenticate
+		if(info != null && info.getProperty("password") != null) {
+			try {
+				String response = this.io.sendRaw(RedisProtocol.AUTH.createMsg(info.getProperty("password")));
+				RedisProtocol.AUTH.parseMsg(response); // will throw RedisResultException if pass is invalid.
+			} catch (IOException e) {
+				throw new SQLException(e);
+			} catch (RedisParseException e) {
+				throw new SQLException(e);
+			} catch (RedisResultException e) {
+				throw new SQLException("Could not authenticate with Redis.");
+			}
+		}
+		
 		this.isClosed = false;
 	}
 
 	@Override
 	public void clearWarnings() throws SQLException {
-		// TODO Auto-generated method stub
-
+		// no op.
 	}
 
+	/**
+	 * Issues a QUIT command to Redis server and closes any socket opened.
+	 * No operations should be done in the connection object after call
+	 * this method.
+	 */
 	@Override
 	public void close() throws SQLException {
-		// TODO Auto-generated method stub
-
+		this.isClosed = true;
+		try {
+			this.io.sendRaw(RedisProtocol.QUIT.createMsg(null));
+			this.io.close();
+		} catch (RedisParseException e) {
+			throw new SQLException(e);
+		} catch (IOException e) {
+			throw new SQLException(e);
+		}
 	}
 
+	/**
+	 * Send a SAVE command to Redis server.
+	 */
 	@Override
 	public void commit() throws SQLException {
-		// TODO Auto-generated method stub
-
+		this.checkConnection();
+		try {
+			this.io.sendRaw(RedisProtocol.SAVE.createMsg(null));
+		} catch (IOException e) {
+			throw new SQLException(e);
+		} catch (RedisParseException e) {
+			throw new SQLException(e);
+		}
 	}
 
 	@Override
 	public Array createArrayOf(String arg0, Object[] arg1) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
 	}
 
 	@Override
 	public Blob createBlob() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
 	}
 
 	@Override
 	public Clob createClob() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
 	}
 
 	@Override
 	public NClob createNClob() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
 	}
 
 	@Override
 	public SQLXML createSQLXML() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
 	}
 
 	@Override
@@ -86,75 +121,64 @@ public class RedisConnection implements java.sql.Connection {
 	@Override
 	public Statement createStatement(int resultSetType, int resultSetConcurrency)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
 	}
 
 	@Override
 	public Statement createStatement(int resultSetType,
 			int resultSetConcurrency, int resultSetHoldability)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
 	}
 
 	@Override
 	public Struct createStruct(String arg0, Object[] arg1) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
 	}
 
 	@Override
 	public boolean getAutoCommit() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public String getCatalog() throws SQLException {
-		// TODO Auto-generated method stub
+		this.checkConnection(); // as API spec says throw exception if conn is closed.
 		return null;
 	}
 
 	@Override
 	public Properties getClientInfo() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
 	}
 
 	@Override
 	public String getClientInfo(String arg0) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
 	}
 
 	@Override
 	public int getHoldability() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
 	}
 
 	@Override
 	public DatabaseMetaData getMetaData() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
 	}
 
 	@Override
 	public int getTransactionIsolation() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return Connection.TRANSACTION_NONE;
 	}
 
 	@Override
 	public Map<String, Class<?>> getTypeMap() throws SQLException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public SQLWarning getWarnings() throws SQLException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -165,41 +189,35 @@ public class RedisConnection implements java.sql.Connection {
 
 	@Override
 	public boolean isReadOnly() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean isValid(int arg0) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return this.isClosed;
 	}
 
 	@Override
 	public String nativeSQL(String sql) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
 	}
 
 	@Override
 	public CallableStatement prepareCall(String sql) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
 	}
 
 	@Override
 	public CallableStatement prepareCall(String sql, int resultSetType,
 			int resultSetConcurrency) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
 	}
 
 	@Override
 	public CallableStatement prepareCall(String sql, int resultSetType,
 			int resultSetConcurrency, int resultSetHoldability)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
 	}
 
 	@Override
@@ -246,93 +264,73 @@ public class RedisConnection implements java.sql.Connection {
 
 	@Override
 	public void releaseSavepoint(Savepoint savepoint) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
 	}
 
 	@Override
 	public void rollback() throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
 	}
 
 	@Override
 	public void rollback(Savepoint savepoint) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
 	}
 
 	@Override
 	public void setAutoCommit(boolean autoCommit) throws SQLException {
-		// TODO Auto-generated method stub
-
+		if(autoCommit == false)
+			throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
 	}
 
 	@Override
 	public void setCatalog(String catalog) throws SQLException {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void setClientInfo(Properties arg0) throws SQLClientInfoException {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void setClientInfo(String arg0, String arg1)
 			throws SQLClientInfoException {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void setHoldability(int holdability) throws SQLException {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void setReadOnly(boolean readOnly) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
 	}
 
 	@Override
 	public Savepoint setSavepoint() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
 	}
 
 	@Override
 	public Savepoint setSavepoint(String name) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
 	}
 
 	@Override
 	public void setTransactionIsolation(int level) throws SQLException {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public boolean isWrapperFor(Class<?> arg0) throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public <T> T unwrap(Class<T> arg0) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
 	}
 
 	protected String msgToServer(String redisMsg) throws SQLException {
