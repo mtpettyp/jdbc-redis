@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<project name="jdbc-redis" basedir="." default="build-all">
+  
+  <property name="src.dir"    value="src" />
+  <property name="test.dir"   value="test" />
+  <property name="build.dir"  value="build/classes" />
+  <property name="jar.dir"    value="target" />
+  <property name="lib.dir"    value="lib"/>
+  <property name="reports.dir" value="junit" />
+  
+  <path id="master-classpath">
+    <pathelement path="${build.dir}"/>
+  	<fileset dir="${lib.dir}">
+    	<include name="*.jar"/>
+	</fileset>
+  </path>
+  
+ <target name="build-all" depends="clean,compile,publish" 
+  description="Clean, compile and creates the jar file."
+ />
+
+  <target name="clean" description="Removes build directory and jar directory.">
+     <delete dir="${build.dir}"/>
+     <delete dir="${target.dir}" />
+     <delete dir="${reports.dir}" />
+  </target>
+
+  <target name="compile" description="Compile main source tree java files">
+    <mkdir dir="${build.dir}"/>
+    <javac destdir="${build.dir}" debug="true"
+      deprecation="false" optimize="false" failonerror="true" >
+      <src path="${src.dir}"/>
+      <src path="${test.dir}" />
+      <classpath refid="master-classpath"/>
+    </javac>
+  </target>
+
+  <target name="publish" depends="compile">
+    <mkdir dir="${jar.dir}"/>
+
+    <jar destfile="${jar.dir}/jdbc-redis.jar" basedir="${build.dir}" > 
+      <fileset dir="${src.dir}/">
+        <include name="META-INF/*" />
+      </fileset>
+    </jar>
+  </target>
+
+  <target name="junit">  
+      <mkdir dir="${reports.dir}"/>
+      <junit printsummary="yes" haltonfailure="false"  failureproperty="junit_test_failed" >
+         <formatter type="xml"/>
+         <classpath>
+             <path refid="master-classpath"/>
+             <pathelement path="${jar.dir}" />
+          </classpath>            
+          <batchtest fork="yes" todir="${reports.dir}" >
+             <fileset dir="${test.dir}" includes="**/*Test.java"/>
+          </batchtest>
+      </junit>
+  	  <fail if="junit_test_failed" message="One or more JUnit tests failed"/>
+  </target>
+  
+</project>
