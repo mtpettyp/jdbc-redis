@@ -87,6 +87,11 @@ public class DriverTest {
 		assertTrue(new br.com.svvs.jdbc.redis.RedisDriver().getMinorVersion() >= 0);
 	}
 
+	//TODO: implement this test
+	public void testGetPropertyInfo() {
+		fail("Not yet implemented");
+	}
+
 	@Test
 	public void testJdbcCompliant() {
 		assertFalse(new br.com.svvs.jdbc.redis.RedisDriver().jdbcCompliant());
