@@ -9,7 +9,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RedisStatement implements Statement {
+public class RedisStatement extends RedisAbstractStatement implements Statement {
 	
 	private RedisConnection conn;
 	private RedisResultSet resultSet;
@@ -282,26 +282,4 @@ public class RedisStatement implements Statement {
 		return null;
 	}
 	
-	private RedisCommandWrapper extractCommand(final String sql) throws RedisParseException {
-		
-		String[] sql_splt = sql.trim().split(" ",2);
-		
-		try {
-			RedisProtocol cmd = RedisProtocol.valueOf(RedisProtocol.class, sql_splt[0].toUpperCase());
-			return new RedisCommandWrapper(cmd, sql_splt.length == 2 ? sql_splt[1] : "");
-		} catch(IllegalArgumentException e) {
-			throw new RedisParseException("Command not recognized.");
-		}
-	}
-	
-	class RedisCommandWrapper {
-		RedisProtocol cmd;
-		String value;
-		
-		RedisCommandWrapper(RedisProtocol cmd, String value) {
-			this.cmd   = cmd;
-			this.value = value;
-		}
-	}
-
 }
