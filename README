@@ -5,6 +5,12 @@ JDBC-Redis is a effort to implement the JDBC API for Redis Database
 about JDBC-Redis, you can find more information at 
 http://code.google.com/p/jdbc-redis.
 
+* IMPORTANT * 
+
+Redis database isn't a relational database, so JDBC-Redis doen't implement
+all JDBC API functionality. If a function is not available a 
+SQLFeatureNotSupportedException will be thrown. 
+
 VERSION INFORMATION
 
 JDBC-Redis is still in beta, this means it works but was not tested enough 
