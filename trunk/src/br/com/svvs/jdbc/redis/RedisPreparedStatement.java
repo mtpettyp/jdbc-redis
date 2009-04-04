@@ -22,18 +22,21 @@ import java.sql.SQLWarning;
 import java.sql.SQLXML;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-public class RedisPreparedStatement implements PreparedStatement {
+public class RedisPreparedStatement extends RedisAbstractStatement implements PreparedStatement {
 	
-	private List<String> parameters = new ArrayList<String>();
+	private Map<Integer,String> parameters = new HashMap<Integer,String>();
+	
+	public RedisPreparedStatement(String sql, RedisConnection conn) {
+		super(sql,conn);
+	}
 
 	@Override
 	public void addBatch() throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
@@ -43,14 +46,29 @@ public class RedisPreparedStatement implements PreparedStatement {
 
 	@Override
 	public boolean execute() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		
+		if(this.isClosed)
+			throw new SQLException("This statement is closed.");
+		
+		// let's try to interpolate all place holders.
+		int idx = 1;
+		while(this.sql.indexOf("?") > 1) {
+			try {
+				this.sql = this.sql.replaceFirst("\\Q\u003F\\E", this.parameters.get(Integer.valueOf(idx)));
+			} catch(IndexOutOfBoundsException e) {
+				throw new SQLException("Can't find defined parameter for position: " + idx);
+			}
+			System.out.println(this.sql);
+			idx++;
+		}
+		
+		return super.execute(this.sql);
 	}
 
 	@Override
 	public ResultSet executeQuery() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		this.execute();
+		return this.resultSet;
 	}
 
 	@Override
@@ -133,7 +151,7 @@ public class RedisPreparedStatement implements PreparedStatement {
 
 	@Override
 	public void setBoolean(int parameterIndex, boolean x) throws SQLException {
-		this.parameters.set(parameterIndex, Boolean.valueOf(x).toString());
+		this.pushIntoParameters(parameterIndex, Boolean.valueOf(x).toString());
 	}
 
 	@Override
@@ -195,17 +213,17 @@ public class RedisPreparedStatement implements PreparedStatement {
 
 	@Override
 	public void setFloat(int parameterIndex, float x) throws SQLException {
-		this.parameters.set(parameterIndex, Float.valueOf(x).toString());
+		this.pushIntoParameters(parameterIndex, Float.valueOf(x).toString());
 	}
 
 	@Override
 	public void setInt(int parameterIndex, int x) throws SQLException {
-		this.parameters.set(parameterIndex, Integer.valueOf(x).toString());
+		this.pushIntoParameters(parameterIndex, Integer.valueOf(x).toString());
 	}
 
 	@Override
 	public void setLong(int parameterIndex, long x) throws SQLException {
-		this.parameters.set(parameterIndex, Long.valueOf(x).toString());
+		this.pushIntoParameters(parameterIndex, Long.valueOf(x).toString());
 	}
 
 	@Override
@@ -236,7 +254,7 @@ public class RedisPreparedStatement implements PreparedStatement {
 
 	@Override
 	public void setNString(int arg0, String arg1) throws SQLException {
-		this.parameters.set(arg0, arg1);
+		this.pushIntoParameters(arg0, arg1);
 	}
 
 	@Override
@@ -284,12 +302,12 @@ public class RedisPreparedStatement implements PreparedStatement {
 
 	@Override
 	public void setShort(int parameterIndex, short x) throws SQLException {
-		this.parameters.set(parameterIndex, Short.valueOf(x).toString());
+		this.pushIntoParameters(parameterIndex, Short.valueOf(x).toString());
 	}
 
 	@Override
 	public void setString(int parameterIndex, String x) throws SQLException {
-		this.parameters.set(parameterIndex, x);
+		this.pushIntoParameters(parameterIndex, x);
 	}
 
 	@Override
@@ -317,7 +335,7 @@ public class RedisPreparedStatement implements PreparedStatement {
 
 	@Override
 	public void setURL(int parameterIndex, URL x) throws SQLException {
-		this.parameters.set(parameterIndex, x.toString());
+		this.pushIntoParameters(parameterIndex, x.toString());
 	}
 
 	@Override
@@ -352,8 +370,8 @@ public class RedisPreparedStatement implements PreparedStatement {
 
 	@Override
 	public void close() throws SQLException {
-		// TODO Auto-generated method stub
-
+		this.conn = null;
+		this.isClosed = true;
 	}
 
 	@Override
@@ -477,8 +495,7 @@ public class RedisPreparedStatement implements PreparedStatement {
 
 	@Override
 	public ResultSet getResultSet() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return this.resultSet;
 	}
 
 	@Override
@@ -577,5 +594,12 @@ public class RedisPreparedStatement implements PreparedStatement {
 	public <T> T unwrap(Class<T> iface) throws SQLException {
 		throw new SQLFeatureNotSupportedException();
 	}
-
+	
+	private void pushIntoParameters(int index, String value) throws SQLException {
+		if(index <= 0)
+			throw new SQLException("Invalid position for parameter (" + index + ")");
+		
+		this.parameters.put(Integer.valueOf(index), value);
+	}
+	
 }
