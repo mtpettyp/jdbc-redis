@@ -11,16 +11,11 @@ import java.util.List;
 
 public class RedisStatement extends RedisAbstractStatement implements Statement {
 	
-	private RedisConnection conn;
-	private RedisResultSet resultSet;
-	
 	// used to batch operations..
 	private List<String> batchOps = new ArrayList<String>();
 	
-	private boolean isClosed;
-
 	public RedisStatement(RedisConnection conn) {
-		this.conn = conn;
+		super(conn);
 	}
 
 	@Override
@@ -45,31 +40,6 @@ public class RedisStatement extends RedisAbstractStatement implements Statement 
 	public void close() throws SQLException {
 		this.conn = null;
 		this.isClosed = true;
-	}
-
-	@Override
-	public boolean execute(String sql) throws SQLException {
-		
-		if(this.isClosed)
-			throw new SQLException("This statement is closed.");
-		
-		try {
-			RedisCommandWrapper wrapper = this.extractCommand(sql);
-			
-			String redisMsg = wrapper.cmd.createMsg(wrapper.value);
-			
-			String[] result = wrapper.cmd.parseMsg(this.conn.msgToServer(redisMsg));
-			
-			if(result != null)
-				this.resultSet = new RedisResultSet(result);
-			
-			return true;
-						
-		} catch (RedisParseException e) {
-			throw new SQLException(e);
-		} catch (RedisResultException e) {
-			throw new SQLException(e);
-		}
 	}
 
 	@Override

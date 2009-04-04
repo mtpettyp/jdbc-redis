@@ -222,8 +222,7 @@ public class RedisConnection implements java.sql.Connection {
 
 	@Override
 	public PreparedStatement prepareStatement(String sql) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return new RedisPreparedStatement(sql, this);
 	}
 
 	@Override
