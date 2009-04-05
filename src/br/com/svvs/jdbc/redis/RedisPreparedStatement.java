@@ -58,7 +58,6 @@ public class RedisPreparedStatement extends RedisAbstractStatement implements Pr
 			} catch(IndexOutOfBoundsException e) {
 				throw new SQLException("Can't find defined parameter for position: " + idx);
 			}
-			System.out.println(this.sql);
 			idx++;
 		}
 		
