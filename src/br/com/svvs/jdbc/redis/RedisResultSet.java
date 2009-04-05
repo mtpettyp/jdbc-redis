@@ -3,6 +3,7 @@ package br.com.svvs.jdbc.redis;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Array;
 import java.sql.Blob;
@@ -28,6 +29,7 @@ public class RedisResultSet implements ResultSet {
 	private String[] result;
 	private int position = -1;
 	private int upperLimit;
+	private boolean isClosed;
 	
 	RedisResultSet(String[] result) {
 		this.result     = result;
@@ -161,9 +163,9 @@ public class RedisResultSet implements ResultSet {
 	@Override
 	public boolean getBoolean(int columnIndex) throws SQLException {
 		String r = this.result[this.position];
-		if(r.equals("0")) {
+		if(r.equals("0") || r.equals("false")) {
 			return false;
-		} else if (r.equals("1")) {
+		} else if (r.equals("1") || r.equals("true")) {
 			return true;
 		} else {
 			throw new SQLException("Don't know how to convert " + r + " into a boolean.");
@@ -239,219 +241,183 @@ public class RedisResultSet implements ResultSet {
 
 	@Override
 	public Date getDate(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public Date getDate(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public Date getDate(int columnIndex, Calendar cal) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public Date getDate(String columnName, Calendar cal) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public double getDouble(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return Double.parseDouble(this.result[this.position]);
 	}
 
 	@Override
 	public double getDouble(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.getDouble(0);
 	}
 
 	@Override
 	public int getFetchDirection() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ResultSet.FETCH_FORWARD;
 	}
 
 	@Override
 	public int getFetchSize() throws SQLException {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public float getFloat(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return Float.parseFloat(this.result[this.position]);
 	}
 
 	@Override
 	public float getFloat(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.getFloat(0);
 	}
 
 	@Override
 	public int getHoldability() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public int getInt(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return Integer.parseInt(this.result[this.position]);
 	}
 
 	@Override
 	public int getInt(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.getInt(0);
 	}
 
 	@Override
 	public long getLong(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return Long.parseLong(this.result[this.position]);
 	}
 
 	@Override
 	public long getLong(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.getLong(0);
 	}
 
 	@Override
 	public ResultSetMetaData getMetaData() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public Reader getNCharacterStream(int arg0) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public Reader getNCharacterStream(String arg0) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public NClob getNClob(int arg0) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public NClob getNClob(String arg0) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public String getNString(int arg0) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return this.result[this.position];
 	}
 
 	@Override
 	public String getNString(String arg0) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return getNString(0);
 	}
 
 	@Override
 	public Object getObject(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public Object getObject(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public Object getObject(int i, Map<String, Class<?>> map)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public Object getObject(String colName, Map<String, Class<?>> map)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public Ref getRef(int i) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public Ref getRef(String colName) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public int getRow() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.position + 1;
 	}
 
 	@Override
 	public RowId getRowId(int arg0) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public RowId getRowId(String arg0) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public SQLXML getSQLXML(int arg0) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public SQLXML getSQLXML(String arg0) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public short getShort(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return Short.parseShort(this.result[this.position]);
 	}
 
 	@Override
 	public short getShort(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.getShort(0);
 	}
 
 	@Override
 	public Statement getStatement() throws SQLException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -467,142 +433,123 @@ public class RedisResultSet implements ResultSet {
 
 	@Override
 	public Time getTime(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public Time getTime(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public Time getTime(int columnIndex, Calendar cal) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public Time getTime(String columnName, Calendar cal) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public Timestamp getTimestamp(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public Timestamp getTimestamp(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public Timestamp getTimestamp(int columnIndex, Calendar cal)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public Timestamp getTimestamp(String columnName, Calendar cal)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public int getType() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ResultSet.TYPE_FORWARD_ONLY;
 	}
 
 	@Override
 	public URL getURL(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			return new URL(this.result[this.position]);
+		} catch (MalformedURLException e) {
+			throw new SQLException(e);
+		}
 	}
 
 	@Override
 	public URL getURL(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return this.getURL(0);
 	}
 
 	@Override
 	public InputStream getUnicodeStream(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public InputStream getUnicodeStream(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public SQLWarning getWarnings() throws SQLException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void insertRow() throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public boolean isAfterLast() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return this.position >= this.upperLimit;
 	}
 
 	@Override
 	public boolean isBeforeFirst() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return this.position < 0;
 	}
 
 	@Override
 	public boolean isClosed() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return this.isClosed;
 	}
 
 	@Override
 	public boolean isFirst() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return this.position == 0;
 	}
 
 	@Override
 	public boolean isLast() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return this.position == this.upperLimit - 1;
 	}
 
 	@Override
 	public boolean last() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void moveToCurrentRow() throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void moveToInsertRow() throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
@@ -617,600 +564,506 @@ public class RedisResultSet implements ResultSet {
 
 	@Override
 	public boolean previous() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void refreshRow() throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public boolean relative(int rows) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public boolean rowDeleted() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public boolean rowInserted() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public boolean rowUpdated() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void setFetchDirection(int direction) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void setFetchSize(int rows) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateArray(int columnIndex, Array x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateArray(String columnName, Array x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateAsciiStream(int arg0, InputStream arg1)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateAsciiStream(String arg0, InputStream arg1)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateAsciiStream(int columnIndex, InputStream x, int length)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateAsciiStream(String columnName, InputStream x, int length)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateAsciiStream(int arg0, InputStream arg1, long arg2)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateAsciiStream(String arg0, InputStream arg1, long arg2)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateBigDecimal(int columnIndex, BigDecimal x)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateBigDecimal(String columnName, BigDecimal x)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateBinaryStream(int arg0, InputStream arg1)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateBinaryStream(String arg0, InputStream arg1)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateBinaryStream(int columnIndex, InputStream x, int length)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateBinaryStream(String columnName, InputStream x, int length)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
-
+	
 	@Override
 	public void updateBinaryStream(int arg0, InputStream arg1, long arg2)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateBinaryStream(String arg0, InputStream arg1, long arg2)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateBlob(int columnIndex, Blob x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateBlob(String columnName, Blob x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateBlob(int arg0, InputStream arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateBlob(String arg0, InputStream arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateBlob(int arg0, InputStream arg1, long arg2)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateBlob(String arg0, InputStream arg1, long arg2)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateBoolean(int columnIndex, boolean x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateBoolean(String columnName, boolean x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateByte(int columnIndex, byte x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateByte(String columnName, byte x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateBytes(int columnIndex, byte[] x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateBytes(String columnName, byte[] x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateCharacterStream(int arg0, Reader arg1)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateCharacterStream(String arg0, Reader arg1)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateCharacterStream(int columnIndex, Reader x, int length)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateCharacterStream(String columnName, Reader reader,
 			int length) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateCharacterStream(int arg0, Reader arg1, long arg2)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateCharacterStream(String arg0, Reader arg1, long arg2)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateClob(int columnIndex, Clob x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateClob(String columnName, Clob x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateClob(int arg0, Reader arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateClob(String arg0, Reader arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateClob(int arg0, Reader arg1, long arg2)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateClob(String arg0, Reader arg1, long arg2)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateDate(int columnIndex, Date x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateDate(String columnName, Date x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateDouble(int columnIndex, double x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateDouble(String columnName, double x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateFloat(int columnIndex, float x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateFloat(String columnName, float x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateInt(int columnIndex, int x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateInt(String columnName, int x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateLong(int columnIndex, long x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateLong(String columnName, long x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateNCharacterStream(int arg0, Reader arg1)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateNCharacterStream(String arg0, Reader arg1)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateNCharacterStream(int arg0, Reader arg1, long arg2)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateNCharacterStream(String arg0, Reader arg1, long arg2)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateNClob(int arg0, NClob arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateNClob(String arg0, NClob arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateNClob(int arg0, Reader arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateNClob(String arg0, Reader arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateNClob(int arg0, Reader arg1, long arg2)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateNClob(String arg0, Reader arg1, long arg2)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateNString(int arg0, String arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateNString(String arg0, String arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateNull(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateNull(String columnName) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateObject(int columnIndex, Object x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateObject(String columnName, Object x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateObject(int columnIndex, Object x, int scale)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateObject(String columnName, Object x, int scale)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateRef(int columnIndex, Ref x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateRef(String columnName, Ref x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateRow() throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateRowId(int arg0, RowId arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateRowId(String arg0, RowId arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateSQLXML(int arg0, SQLXML arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateSQLXML(String arg0, SQLXML arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateShort(int columnIndex, short x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateShort(String columnName, short x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateString(int columnIndex, String x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateString(String columnName, String x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateTime(int columnIndex, Time x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateTime(String columnName, Time x) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateTimestamp(int columnIndex, Timestamp x)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public void updateTimestamp(String columnName, Timestamp x)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public boolean wasNull() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		throw new SQLFeatureNotSupportedException();
 	}
-
+	
 	@Override
 	public boolean isWrapperFor(Class<?> iface) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 	@Override
 	public <T> T unwrap(Class<T> iface) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new SQLFeatureNotSupportedException();
 	}
 
 }
