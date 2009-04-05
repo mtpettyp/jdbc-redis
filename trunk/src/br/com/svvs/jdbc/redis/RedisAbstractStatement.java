@@ -1,6 +1,7 @@
 package br.com.svvs.jdbc.redis;
 
 import java.sql.SQLException;
+import br.com.svvs.jdbc.redis.RedisProtocol;
 
 public abstract class RedisAbstractStatement {
 	

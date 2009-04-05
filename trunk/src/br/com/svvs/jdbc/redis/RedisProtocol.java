@@ -535,4 +535,9 @@ public enum RedisProtocol implements RedisMessageHandler {
 	RedisProtocol(RedisDigester d) {
 		this.digester = d;
 	}
+	
+	// don't know why Ant need this! Eclipse can compile only implementing 
+	// the Message handler interface.
+	public abstract String  createMsg(String msg) throws RedisParseException;
+	public abstract String[] parseMsg(String msg) throws RedisResultException;
 }
