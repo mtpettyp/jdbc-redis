@@ -1,4 +1,4 @@
-package br.com.svvs.jdbc.redis.devel;
+
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class RedisGetSetSample {
+public class RedisSetGetSample {
 
 	/**
 	 * @param args
@@ -37,7 +37,7 @@ public class RedisGetSetSample {
 		
 		long interval = (System.currentTimeMillis() - start)/1000;
 		
-		System.out.println("done SET in " + interval + " seconds.");
+		System.out.println("done " + TEST_LOOP + " SETs in " + interval + " seconds.");
 		
 		start = System.currentTimeMillis();
 		
@@ -56,7 +56,7 @@ public class RedisGetSetSample {
 		
 		interval = (System.currentTimeMillis() - start) /1000;
 		
-		System.out.println("done GET in " + interval + " seconds. ");
+		System.out.println("done " + TEST_LOOP + " GETs in " + interval + " seconds. ");
 
 	}
 
