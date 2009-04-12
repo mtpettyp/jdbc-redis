@@ -518,6 +518,19 @@ public enum RedisProtocol implements RedisMessageHandler {
 			return null;
 		}
 	},
+	EXPIRE(new RedisSimpleDigester("EXPIRE")) {
+
+		@Override
+		public String createMsg(String msg) throws RedisParseException {
+			return this.digester.createSimpleCommand(msg);
+		}
+
+		@Override
+		public String[] parseMsg(String msg) throws RedisResultException {
+			return this.digester.parseResultMessage(msg);
+		}
+		
+	},
 	AUTH(new RedisSimpleDigester("AUTH")) {
 		@Override
 		public String createMsg(String msg) throws RedisParseException {
