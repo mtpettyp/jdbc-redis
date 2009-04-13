@@ -14,7 +14,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class StringCommandsTest {
+public class CommandsTest {
 	
 	private static Connection conn;
 	private static SortedMap<String,String> map;
@@ -312,6 +312,153 @@ public class StringCommandsTest {
 		} catch (SQLException e) {
 			fail(e.getMessage());
 		}
+	}
+	
+	@Test
+	public void keys() {
+		String keyGlob = keyPrefix + "_99*";
+		ResultSet rs;
+		try {
+			rs = conn.createStatement().executeQuery("KEYS " + keyGlob);
+			while(rs.next()) {
+				assertTrue(map.containsKey(rs.getString(0)));
+			}
+		} catch (SQLException e) {
+			fail(e.getMessage());
+		}
+	}
+	/**
+	 * Note that RANDOMKEY returns a random key from the database
+	 * and not necessarily a key we know. If the database was empty
+	 * this test will perform correctly otherwise it can fail.
+	 */
+	@Test
+	public void randomkey() {
+		ResultSet rs;
+		try {
+			rs = conn.createStatement().executeQuery("RANDOMKEY");
+			while(rs.next()) {
+				assertTrue(map.containsKey(rs.getString(0)));
+			}
+		} catch (SQLException e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void rename() {
+		String oldNameKey = keyPrefix + "_RENAME_TEST_OLD_KEY";
+		String newNameKey = keyPrefix + "_RENAME_TEST_NEW_KEY";
+		
+		ResultSet rs;
+		try {
+			// setting a test key...
+			conn.createStatement().execute("SET "    + oldNameKey + " value");
+			// now we rename it, it should destroy the old key.
+			conn.createStatement().execute("RENAME " + oldNameKey + " " + newNameKey);
+			
+			// a get on the old key should return null.
+			rs = conn.createStatement().executeQuery("GET " + oldNameKey);
+			while(rs.next()) assertNull(rs.getString(0));
+			
+			// the new key should be defined and with out value.
+			rs = conn.createStatement().executeQuery("GET " + newNameKey);
+			while(rs.next()) assertEquals("value", rs.getString(0));
+			
+			// cleanup
+			conn.createStatement().execute("DEL " + newNameKey);
+			
+		} catch (SQLException e) {
+			fail(e.getMessage());
+		}
+		
+	}
+	
+	@Test
+	public void renamenx() {
+		String oldNameKey = keyPrefix + "_RENAMENX_TEST_OLD_KEY";
+		String newNameKey = keyPrefix + "_RENAMENX_TEST_NEW_KEY";
+		
+		ResultSet rs;
+		try {
+			// setting a test key...
+			conn.createStatement().execute("SET " + oldNameKey + " value");
+			
+			// now we rename it, it should destroy the old key and return true.
+			rs = conn.createStatement().executeQuery("RENAMENX " + oldNameKey + " " + newNameKey);
+			while(rs.next()) assertTrue(rs.getBoolean(0));
+			
+			// a get on the old key should return null.
+			rs = conn.createStatement().executeQuery("GET " + oldNameKey);
+			while(rs.next()) assertNull(rs.getString(0));
+			
+			// the new key should be defined and with out value.
+			rs = conn.createStatement().executeQuery("GET " + newNameKey);
+			while(rs.next()) assertEquals("value", rs.getString(0));
+			
+			// now let's set the old one again
+			conn.createStatement().execute("SET " + oldNameKey + " value");
+			
+			// the new key already exists and renamenx should return false.
+			rs = conn.createStatement().executeQuery("RENAMENX " + oldNameKey + " " + newNameKey);
+			while(rs.next()) assertFalse(rs.getBoolean(0));
+			
+			// cleanup
+			conn.createStatement().execute("DEL " + oldNameKey);
+			conn.createStatement().execute("DEL " + newNameKey);
+			
+		} catch (SQLException e) {
+			fail(e.getMessage());
+		}
+		
+	}
+	
+	@Test
+	public void dbsize() {
+		// dbsize depends of how many keys we have in
+		// our test map, so we use map.size()
+		ResultSet rs;
+		try {
+			rs = conn.createStatement().executeQuery("DBSIZE");
+			while(rs.next()) {
+				assertEquals(map.size(), rs.getInt(0));
+			}
+		} catch (SQLException e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void expire() {
+		String key = keyPrefix + "_EXPIRE_TEST_KEY";
+		ResultSet rs;
+		try {
+			// create a key...
+			conn.createStatement().execute("INCR " + key);
+			
+			// the key should not exists anymore.
+			rs = conn.createStatement().executeQuery("GET " + key);
+			while(rs.next()) assertNotNull(rs.getString(0));
+			
+			// set it to expire in two seconds...
+			conn.createStatement().execute("EXPIRE " + key + " 1");
+			
+			// sleep a little so Redis can remove the key in time.
+			try {
+				Thread.sleep(2000);
+			}
+			catch (InterruptedException e) {
+				fail(e.getMessage());
+			}
+			
+			// the key should not exists anymore.
+			rs = conn.createStatement().executeQuery("GET " + key);
+			while(rs.next()) assertNull(rs.getString(0));
+
+		} catch (SQLException e) {
+			fail(e.getMessage());
+		}
+		
 	}
 	
 	@AfterClass
