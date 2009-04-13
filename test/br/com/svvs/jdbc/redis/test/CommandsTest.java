@@ -14,6 +14,12 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+/**
+ * These are simple tests to check if the commands are working
+ * properly.
+ * @author mavcunha
+ *
+ */
 public class CommandsTest {
 	
 	private static Connection conn;
@@ -287,7 +293,7 @@ public class CommandsTest {
 			String setKey   = keyPrefix  + "_TYPE_SET_TEST_KEY";
 			String nonKey   = keyPrefix  + "_TYPE_NONE_TEST_KEY";
 			
-			// create a string key
+			// create some possible types
 			conn.createStatement().execute("SET "   + stringKey + " value");
 			conn.createStatement().execute("LPUSH " + listKey   + " value");
 			conn.createStatement().execute("SADD "  + setKey    + " value");
@@ -408,11 +414,15 @@ public class CommandsTest {
 			conn.createStatement().execute("DEL " + newNameKey);
 			
 		} catch (SQLException e) {
+			
 			fail(e.getMessage());
 		}
 		
 	}
 	
+	/**
+	 * This test will work on a empty Redis instance.
+	 */
 	@Test
 	public void dbsize() {
 		// dbsize depends of how many keys we have in
@@ -436,16 +446,16 @@ public class CommandsTest {
 			// create a key...
 			conn.createStatement().execute("INCR " + key);
 			
-			// the key should not exists anymore.
+			// the key should exists.
 			rs = conn.createStatement().executeQuery("GET " + key);
 			while(rs.next()) assertNotNull(rs.getString(0));
 			
-			// set it to expire in two seconds...
+			// set it to expire in one seconds...
 			conn.createStatement().execute("EXPIRE " + key + " 1");
 			
 			// sleep a little so Redis can remove the key in time.
 			try {
-				Thread.sleep(2000);
+				Thread.sleep(2000); // two seconds
 			}
 			catch (InterruptedException e) {
 				fail(e.getMessage());
@@ -459,6 +469,230 @@ public class CommandsTest {
 			fail(e.getMessage());
 		}
 		
+	}
+	
+	@Test
+	public void rpush() {
+		String key = keyPrefix + "_RPUSH_TEST_KEY";
+		try {
+			// let's push two elements
+			conn.createStatement().execute("RPUSH " + key + " first");
+			conn.createStatement().execute("RPUSH " + key + " second");
+			
+			// now the second element should be in last position
+			ResultSet rs = conn.createStatement().executeQuery("LINDEX " + key + " 1");
+			while(rs.next()) assertEquals("second", rs.getString(0));
+			
+			//cleanup
+			conn.createStatement().execute("DEL " + key); 
+			
+		} catch (SQLException e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void lpush() {
+		String key = keyPrefix + "_LPUSH_TEST_KEY";
+		try {
+			// let's push two elements
+			conn.createStatement().execute("LPUSH " + key + " first");
+			conn.createStatement().execute("LPUSH " + key + " second");
+			
+			// now the first element should be in last position
+			ResultSet rs = conn.createStatement().executeQuery("LINDEX " + key + " 1");
+			while(rs.next()) assertEquals("first", rs.getString(0));
+			
+			//cleanup
+			conn.createStatement().execute("DEL " + key); 
+			
+		} catch (SQLException e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void llen() {
+		String key = keyPrefix + "_LLEN_TEST_KEY";
+		try {
+			// let's push two elements
+			conn.createStatement().execute("RPUSH " + key + " first");
+			conn.createStatement().execute("RPUSH " + key + " second");
+			
+			// this list should have two elements.
+			ResultSet rs = conn.createStatement().executeQuery("LLEN " + key);
+			while(rs.next()) assertEquals(2, rs.getInt(0));
+			
+			//cleanup
+			conn.createStatement().execute("DEL " + key); 
+			
+		} catch (SQLException e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void lrange() {
+		String key = keyPrefix + "_LRANGE_TEST_KEY";
+		try {
+			// let's push two elements
+			conn.createStatement().execute("LPUSH " + key + " first");
+			conn.createStatement().execute("LPUSH " + key + " second");
+			
+			String[] result = new String[]{"first","second"};
+			
+			// this list should have two elements.
+			ResultSet rs = conn.createStatement().executeQuery("LRANGE " + key + " 1 2");
+			int i = 0;
+			while(rs.next()) {
+				assertEquals(result[i], rs.getString(0));
+				i++;
+			}
+			
+			//cleanup
+			conn.createStatement().execute("DEL " + key); 
+			
+		} catch (SQLException e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void ltrim() {
+		String key = keyPrefix + "_LTRIM_TEST_KEY";
+		try {
+			// let's push two elements
+			conn.createStatement().execute("RPUSH " + key + " first");
+			conn.createStatement().execute("RPUSH " + key + " second");
+			conn.createStatement().execute("RPUSH " + key + " third");
+			
+			// trim out 
+			conn.createStatement().execute("LTRIM " + key + " 0 1");
+			
+			String[] r = new String[]{"first","second"};
+			
+			// this list should have two elements.
+			ResultSet rs = conn.createStatement().executeQuery("LRANGE " + key + " 0 2");
+			int i = 0;
+			while(rs.next()) {
+				assertEquals(r[i], rs.getString(0));
+				i++;
+			}
+			
+			//cleanup
+			conn.createStatement().execute("DEL " + key); 
+			
+		} catch (SQLException e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void lpop() {
+		String key = keyPrefix + "_LPOP_TEST_KEY";
+		try {
+			// let's push two elements
+			conn.createStatement().execute("RPUSH " + key + " first");
+			conn.createStatement().execute("RPUSH " + key + " second");
+			conn.createStatement().execute("RPUSH " + key + " third");
+			
+			String[] r = new String[]{"first","second","third"};
+			
+			for(int i = 0; i < r.length; i++) {
+				ResultSet rs = conn.createStatement().executeQuery("LPOP " + key);
+				while(rs.next()) {
+					assertEquals(r[i], rs.getString(0));
+				}
+			}
+			
+			//cleanup
+			conn.createStatement().execute("DEL " + key); 
+			
+		} catch (SQLException e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void rpop() {
+		String key = keyPrefix + "_RPOP_TEST_KEY";
+		try {
+			// let's push two elements
+			conn.createStatement().execute("RPUSH " + key + " first");
+			conn.createStatement().execute("RPUSH " + key + " second");
+			conn.createStatement().execute("RPUSH " + key + " third");
+			
+			String[] r = new String[]{"third","second","first"};
+			
+			for(int i = 0; i < r.length; i++) {
+				ResultSet rs = conn.createStatement().executeQuery("RPOP " + key);
+				while(rs.next()) {
+					assertEquals(r[i], rs.getString(0));
+				}
+			}
+			
+			//cleanup
+			conn.createStatement().execute("DEL " + key); 
+			
+		} catch (SQLException e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void lset() {
+		String key = keyPrefix + "_LSET_TEST_KEY";
+		try {
+			// let's push two elements
+			conn.createStatement().execute("RPUSH " + key + " first");
+			conn.createStatement().execute("RPUSH " + key + " second");
+			conn.createStatement().execute("RPUSH " + key + " third");
+			
+			String[] r = new String[]{"first","second","new_third"};
+			
+			conn.createStatement().execute("LSET " + key + " 2 new_third");
+			
+			for(int i = 0; i < r.length; i++) {
+				ResultSet rs = conn.createStatement().executeQuery("LPOP " + key);
+				while(rs.next()) {
+					assertEquals(r[i], rs.getString(0));
+				}
+			}
+			
+			//cleanup
+			conn.createStatement().execute("DEL " + key); 
+			
+		} catch (SQLException e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void lrem() {
+		String key = keyPrefix + "_LREM_TEST_KEY";
+		try {
+			// let's push two elements
+			conn.createStatement().execute("RPUSH " + key + " first");
+			conn.createStatement().execute("RPUSH " + key + " second");
+			conn.createStatement().execute("RPUSH " + key + " third");
+			
+			String[] r = new String[]{"first","third"};
+			
+			conn.createStatement().execute("LREM " + key + " 1 second");
+			
+			for(int i = 0; i < r.length; i++) {
+				ResultSet rs = conn.createStatement().executeQuery("LPOP " + key);
+				while(rs.next()) {
+					assertEquals(r[i], rs.getString(0));
+				}
+			}
+			
+			//cleanup
+			conn.createStatement().execute("DEL " + key); 
+			
+		} catch (SQLException e) {
+			fail(e.getMessage());
+		}
 	}
 	
 	@AfterClass
