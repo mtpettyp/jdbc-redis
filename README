@@ -37,7 +37,9 @@ $ cd jdbc-redis/
 $ ant
 
 The jar file will be inside the target/ directory. To test the file use the online-tests
-target of Ant, first start a Redis instance and then invoke Ant.
+target of Ant, first start a Redis instance and then invoke Ant. NOTE: These tests
+should not mess with previous saved data, but it's *highly recommended* that your
+Redis instance is a a empty one.
 
 1. Start a Redis database instance.
 2. Call Ant with "online-tests" as target.
