@@ -17,7 +17,7 @@ public class RedisSample {
 
 	public static void main(String[] args) throws SQLException, ClassNotFoundException {
 		
-		Class.forName("br.com.svvs.jdbc.redis.Driver");
+		Class.forName("br.com.svvs.jdbc.redis.RedisDriver");
 		
 		Connection conn = DriverManager.getConnection("jdbc:redis://localhost");
 		
