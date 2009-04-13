@@ -16,13 +16,8 @@ VERSION INFORMATION
 JDBC-Redis is still in beta, this means it works but was not tested enough 
 to be considered a production release. See the BUGS file to know more about
 how to report bugs and help on JDBC-Redis development. Visit the project website
- (http://code.google.com/p/jdbc-redis) to know more.
-
-INSTALATION
-
-JDBC-Redis is a common jar file (dist/jdbc-redis_VERSION.jar) just make sure this
-file is in your CLASSPATH. See http://faq.javaranch.com/java/HowToSetTheClasspath 
-for more info.
+ (http://code.google.com/p/jdbc-redis) to know more. For compatibility between
+ JDBC-Redis and Redis database look at the VERSION file.
 
 SAMPLES
 

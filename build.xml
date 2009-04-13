@@ -27,6 +27,10 @@
 
   <target name="compile" description="Compile main source tree java files">
     <mkdir dir="${build.dir}"/>
+   	<copy todir="${build.dir}">
+    	  <fileset dir="${src.dir}"  includes="*.properties" />
+   		  <fileset dir="${test.dir}" includes="*.properties" />
+    </copy>
     <javac destdir="${build.dir}" debug="true" verbose="false"
       deprecation="false" optimize="false" failonerror="true" compiler="javac1.6" >
       <src path="${src.dir}"/>
@@ -45,7 +49,7 @@
     </jar>
   </target>
 
-  <target name="junit">  
+  <target name="online-tests">  
       <mkdir dir="${reports.dir}"/>
       <junit printsummary="yes" haltonfailure="false"  failureproperty="junit_test_failed" >
          <formatter type="xml"/>
