@@ -23,6 +23,7 @@
      <delete dir="${build.dir}"/>
      <delete dir="${target.dir}" />
      <delete dir="${reports.dir}" />
+  	 <delete dir="${jar.dir}" /> 
   </target>
 
   <target name="compile" description="Compile main source tree java files">
@@ -41,7 +42,6 @@
 
   <target name="publish" depends="compile">
     <mkdir dir="${jar.dir}"/>
-
     <jar destfile="${jar.dir}/jdbc-redis.jar" basedir="${build.dir}" > 
       <fileset dir="${src.dir}/">
         <include name="META-INF/*" />
