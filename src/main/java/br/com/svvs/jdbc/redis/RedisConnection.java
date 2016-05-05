@@ -26,7 +26,7 @@ public class RedisConnection implements java.sql.Connection {
     private RedisIO io = null;
     private boolean isClosed = true;
 
-    private final String NOT_SUPPORTED = "This operation is not supported by Redis or this driver.";
+    private final String NOT_SUPPORTED = "This operation is not supported by Redis or this driver. (%s)";
 
     public RedisConnection(RedisIO io, Properties info) throws SQLException {
 
@@ -92,27 +92,27 @@ public class RedisConnection implements java.sql.Connection {
 
     @Override
     public Array createArrayOf(String arg0, Object[] arg1) throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("createArrayOf(Ljava/lang/String;[Ljava/lang/Object;)Ljava/sql/Array;"));
     }
 
     @Override
     public Blob createBlob() throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("createBlob()Ljava/sql/Blob;"));
     }
 
     @Override
     public Clob createClob() throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("createClob()Ljava/sql/Clob;"));
     }
 
     @Override
     public NClob createNClob() throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("createNClob()Ljava/sql/NClob;"));
     }
 
     @Override
     public SQLXML createSQLXML() throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("createSQLXML()Ljava/sql/SQLXML;"));
     }
 
     @Override
@@ -123,19 +123,19 @@ public class RedisConnection implements java.sql.Connection {
     @Override
     public Statement createStatement(int resultSetType, int resultSetConcurrency)
             throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("createStatement(II)Ljava/sql/Statement;"));
     }
 
     @Override
     public Statement createStatement(int resultSetType,
             int resultSetConcurrency, int resultSetHoldability)
             throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("createStatement(III)Ljava/sql/Statement;"));
     }
 
     @Override
     public Struct createStruct(String arg0, Object[] arg1) throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("createStruct(Ljava/lang/String;[Ljava/lang/Object;)Ljava/sql/Struct;"));
     }
 
     @Override
@@ -151,22 +151,22 @@ public class RedisConnection implements java.sql.Connection {
 
     @Override
     public Properties getClientInfo() throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("getClientInfo()Ljava/util/Properties;"));
     }
 
     @Override
     public String getClientInfo(String arg0) throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("getClientInfo(Ljava/lang/String;)Ljava/lang/String;"));
     }
 
     @Override
     public int getHoldability() throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("getHoldability()I"));
     }
 
     @Override
     public DatabaseMetaData getMetaData() throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("getMetaData()Ljava/sql/DatabaseMetaData;"));
     }
 
     @Override
@@ -201,25 +201,25 @@ public class RedisConnection implements java.sql.Connection {
 
     @Override
     public String nativeSQL(String sql) throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("nativeSQL(Ljava/lang/String;)Ljava/lang/String;"));
     }
 
     @Override
     public CallableStatement prepareCall(String sql) throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("prepareCall(Ljava/lang/String;)Ljava/sql/CallableStatement;"));
     }
 
     @Override
     public CallableStatement prepareCall(String sql, int resultSetType,
             int resultSetConcurrency) throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("prepareCall(Ljava/lang/String;II)Ljava/sql/CallableStatement;"));
     }
 
     @Override
     public CallableStatement prepareCall(String sql, int resultSetType,
             int resultSetConcurrency, int resultSetHoldability)
             throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("prepareCall(Ljava/lang/String;III)Ljava/sql/CallableStatement;"));
     }
 
     @Override
@@ -230,53 +230,53 @@ public class RedisConnection implements java.sql.Connection {
     @Override
     public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys)
             throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("prepareStatement(Ljava/lang/String;I)Ljava/sql/PreparedStatement;"));
     }
 
     @Override
     public PreparedStatement prepareStatement(String sql, int[] columnIndexes)
             throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("prepareStatement(Ljava/lang/String;[I)Ljava/sql/PreparedStatement;"));
     }
 
     @Override
     public PreparedStatement prepareStatement(String sql, String[] columnNames)
             throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("prepareStatement(Ljava/lang/String;[Ljava/lang/String;)Ljava/sql/PreparedStatement;"));
     }
 
     @Override
     public PreparedStatement prepareStatement(String sql, int resultSetType,
             int resultSetConcurrency) throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("prepareStatement(Ljava/lang/String;II)Ljava/sql/PreparedStatement;"));
     }
 
     @Override
     public PreparedStatement prepareStatement(String sql, int resultSetType,
             int resultSetConcurrency, int resultSetHoldability)
             throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("prepareStatement(Ljava/lang/String;III)Ljava/sql/PreparedStatement;"));
     }
 
     @Override
     public void releaseSavepoint(Savepoint savepoint) throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("releaseSavepoint(Ljava/sql/Savepoint;)V"));
     }
 
     @Override
     public void rollback() throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("rollback()V"));
     }
 
     @Override
     public void rollback(Savepoint savepoint) throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("rollback(Ljava/sql/Savepoint;)V"));
     }
 
     @Override
     public void setAutoCommit(boolean autoCommit) throws SQLException {
         if(autoCommit == false)
-            throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+            throw new SQLFeatureNotSupportedException(unsupportedMethod("setAutoCommit(Z)V"));
     }
 
     @Override
@@ -298,17 +298,17 @@ public class RedisConnection implements java.sql.Connection {
 
     @Override
     public void setReadOnly(boolean readOnly) throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("setReadOnly(Z)V"));
     }
 
     @Override
     public Savepoint setSavepoint() throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("setSavepoint()Ljava/sql/Savepoint;"));
     }
 
     @Override
     public Savepoint setSavepoint(String name) throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("setSavepoint(Ljava/lang/String;)Ljava/sql/Savepoint;"));
     }
 
     @Override
@@ -326,7 +326,7 @@ public class RedisConnection implements java.sql.Connection {
 
     @Override
     public <T> T unwrap(Class<T> arg0) throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("unwrap(Ljava/lang/Class;)Ljava/lang/Object;"));
     }
 
     protected String msgToServer(String redisMsg) throws SQLException {
@@ -348,27 +348,31 @@ public class RedisConnection implements java.sql.Connection {
 
     @Override
     public void setSchema(String schema) throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("setSchema(Ljava/lang/String;)V"));
     }
 
     @Override
     public String getSchema() throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("getSchema()Ljava/lang/String;"));
     }
 
     @Override
     public void abort(Executor executor) throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("abort(Ljava/util/concurrent/Executor;)V"));
     }
 
     @Override
     public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("setNetworkTimeout(Ljava/util/concurrent/Executor;I)V"));
     }
 
     @Override
     public int getNetworkTimeout() throws SQLException {
-        throw new SQLFeatureNotSupportedException(NOT_SUPPORTED);
+        throw new SQLFeatureNotSupportedException(unsupportedMethod("getNetworkTimeout()I"));
+    }
+
+    private String unsupportedMethod(final String method) {
+        return String.format(NOT_SUPPORTED, method);
     }
 
 }
