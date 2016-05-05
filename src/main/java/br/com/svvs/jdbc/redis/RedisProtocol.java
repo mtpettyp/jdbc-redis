@@ -5,7 +5,7 @@ public enum RedisProtocol implements RedisMessageHandler {
     SET(new RedisSimpleDigester("SET")){
         @Override
         public String createMsg(String msg) throws RedisParseException {
-            return this.digester.createBulkCommand(msg);
+            return this.digester.createSimpleCommand(msg);
         }
 
         @Override
@@ -41,7 +41,7 @@ public enum RedisProtocol implements RedisMessageHandler {
 
         @Override
         public String createMsg(String msg) throws RedisParseException {
-            return this.digester.createBulkCommand(msg);
+            return this.digester.createSimpleCommand(msg);
         }
 
         @Override
@@ -145,11 +145,12 @@ public enum RedisProtocol implements RedisMessageHandler {
             String[] r =  this.digester.parseResultMessage(msg);
             // keys is a bulk reply but should be a multi bulk reply.
             // we create a array of keys instead of a string of keys.
-            if(r.length == 1) {
-                return r[0].split(" ");
-            } else {
-                throw new RedisResultException("Error trying to convert KEYS command reply.");
-            }
+            return r;
+//            if(r.length == 1) {
+//                return r[0].split(" ");
+//            } else {
+//                throw new RedisResultException("Error trying to convert KEYS command reply.");
+//            }
         }
     },
     RANDOMKEY(new RedisSimpleDigester("RANDOMKEY")) {
@@ -203,7 +204,7 @@ public enum RedisProtocol implements RedisMessageHandler {
     RPUSH(new RedisSimpleDigester("RPUSH")){
         @Override
         public String createMsg(String msg) throws RedisParseException {
-            return this.digester.createBulkCommand(msg);
+            return this.digester.createSimpleCommand(msg);
         }
 
         @Override
@@ -215,7 +216,7 @@ public enum RedisProtocol implements RedisMessageHandler {
     LPUSH(new RedisSimpleDigester("LPUSH")){
         @Override
         public String createMsg(String msg) throws RedisParseException {
-            return this.digester.createBulkCommand(msg);
+            return this.digester.createSimpleCommand(msg);
         }
 
         @Override
@@ -275,7 +276,7 @@ public enum RedisProtocol implements RedisMessageHandler {
     LSET(new RedisSimpleDigester("LSET")){
         @Override
         public String createMsg(String msg) throws RedisParseException {
-            return this.digester.createBulkCommand(msg,1);
+            return this.digester.createSimpleCommand(msg);
         }
 
         @Override
@@ -287,7 +288,7 @@ public enum RedisProtocol implements RedisMessageHandler {
     LREM(new RedisSimpleDigester("LREM")){
         @Override
         public String createMsg(String msg) throws RedisParseException {
-            return this.digester.createBulkCommand(msg,1);
+            return this.digester.createSimpleCommand(msg);
         }
 
         @Override
