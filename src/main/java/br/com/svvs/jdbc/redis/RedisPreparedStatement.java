@@ -78,7 +78,7 @@ public class RedisPreparedStatement extends RedisAbstractStatement implements Pr
 
     @Override
     public ResultSetMetaData getMetaData() throws SQLException {
-        return null;
+        return new RedisResultSetMetaData();
     }
 
     @Override
