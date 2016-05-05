@@ -1,0 +1,8 @@
+language: java
+script: mvn clean verify
+notifications:
+  email: false
+jdk: 
+  - oraclejdk8
+services:
+  - redis-server
