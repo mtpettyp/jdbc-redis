@@ -166,7 +166,7 @@ public class RedisConnection implements java.sql.Connection {
 
     @Override
     public DatabaseMetaData getMetaData() throws SQLException {
-        throw new SQLFeatureNotSupportedException(unsupportedMethod("getMetaData()Ljava/sql/DatabaseMetaData;"));
+        return new RedisDatabaseMetaData();
     }
 
     @Override
