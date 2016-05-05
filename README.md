@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/mtpettyp/jdbc-redis.svg?branch=master)](https://travis-ci.org/mtpettyp/jdbc-redis)
+
 JDBC-Redis README file.
 
 JDBC-Redis is a effort to implement the JDBC API for Redis Database
