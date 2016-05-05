@@ -35,7 +35,8 @@ public class RedisConnection implements java.sql.Connection {
         this.io = io;
 
         // we got a connection, let's try to authenticate
-        if(info != null && info.getProperty("password") != null) {
+        if(info != null && info.getProperty("password") != null &&
+                info.getProperty("password").length() > 0) {
             try {
                 String response = this.io.sendRaw(RedisProtocol.AUTH.createMsg(info.getProperty("password")));
                 RedisProtocol.AUTH.parseMsg(response); // will throw RedisResultException if pass is invalid.
