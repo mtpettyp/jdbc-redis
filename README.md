@@ -67,7 +67,7 @@ The following is the list of currently supported statements:
 
 | Command | Implemented |
 | ------- | :-----------: |
-| APPEND | :x: |
+| APPEND | :white_check_mark: |
 | AUTH | :white_check_mark: |
 | BGREWRITEAOF | :x: |
 | BGSAVE | :white_check_mark: |
