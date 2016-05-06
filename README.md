@@ -136,7 +136,7 @@ The following is the list of currently supported statements:
 | GET | :white_check_mark: |
 | GETBIT | :x: |
 | GETRANGE | :x: |
-| GETSET | :x: |
+| GETSET | :white_check_mark: |
 | HDEL | :x: |
 | HEXISTS | :x: |
 | HGET | :x: |

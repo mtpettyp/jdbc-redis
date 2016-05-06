@@ -564,6 +564,17 @@ public enum RedisProtocol implements RedisMessageHandler {
         public String[] parseMsg(String msg) throws RedisResultException {
             return this.digester.parseResultMessage(msg);
         }
+    },
+    GETSET(new RedisSimpleDigester("GETSET")) {
+        @Override
+        public String createMsg(String msg) throws RedisParseException {
+            return this.digester.createSimpleCommand(msg);
+        }
+
+        @Override
+        public String[] parseMsg(String msg) throws RedisResultException {
+            return this.digester.parseResultMessage(msg);
+        }
     };
 
     // message digester

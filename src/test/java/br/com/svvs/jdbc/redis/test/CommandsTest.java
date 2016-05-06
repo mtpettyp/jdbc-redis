@@ -767,6 +767,33 @@ public class CommandsTest {
         }
     }
 
+    @Test
+    public void getset() {
+        try {
+            Statement st = conn.createStatement();
+            String prefix = keyPrefix;
+            // let's add multiple keys
+            ResultSet resultSet = st.executeQuery("SET " + prefix + "_GETSET value");
+            while(resultSet.next()) {
+                assertEquals("OK", resultSet.getString(0));
+            }
+            resultSet.close();
+
+            resultSet = st.executeQuery("GETSET " + prefix + "_GETSET value1");
+            while(resultSet.next()) {
+                assertEquals("value", resultSet.getString(0));
+            }
+            resultSet.close();
+
+            // remove the test key..
+            conn.createStatement().execute("DEL " + prefix + "_GETSET");
+
+        } catch(SQLException e) {
+            fail(e.getMessage());
+        }
+    }
+
+
     @AfterClass
     public static void clean() {
         for(String key : map.keySet()) {
