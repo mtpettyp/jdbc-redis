@@ -172,7 +172,7 @@ The following is the list of currently supported statements:
 | MIGRATE | :x: |
 | MONITOR | :x: |
 | MOVE | :white_check_mark: |
-| MSET | :x: |
+| MSET | :white_check_mark: |
 | MSETNX | :x: |
 | MULTI | :x: |
 | OBJECT | :x: |

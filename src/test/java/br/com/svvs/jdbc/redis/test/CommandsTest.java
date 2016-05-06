@@ -733,6 +733,40 @@ public class CommandsTest {
         }
     }
 
+    @Test
+    public void mset() {
+        try {
+            Statement st = conn.createStatement();
+            String prefix = keyPrefix;
+            // let's add multiple keys
+            ResultSet resultSet = st.executeQuery("MSET " + prefix + "_MSET1 value1 "
+                    + prefix + "_MSET2 value2");
+            while(resultSet.next()) {
+                assertEquals("OK", resultSet.getString(0));
+            }
+            resultSet.close();
+
+            resultSet = st.executeQuery("GET " + prefix + "_MSET1");
+            while(resultSet.next()) {
+                assertEquals("value1", resultSet.getString(0));
+            }
+            resultSet.close();
+
+            resultSet = st.executeQuery("GET " + prefix + "_MSET2");
+            while(resultSet.next()) {
+                assertEquals("value2", resultSet.getString(0));
+            }
+            resultSet.close();
+
+            // remove the test key..
+            conn.createStatement().execute("DEL " + prefix + "_MSET1");
+            conn.createStatement().execute("DEL " + prefix + "_MSET2");
+
+        } catch(SQLException e) {
+            fail(e.getMessage());
+        }
+    }
+
     @AfterClass
     public static void clean() {
         for(String key : map.keySet()) {
