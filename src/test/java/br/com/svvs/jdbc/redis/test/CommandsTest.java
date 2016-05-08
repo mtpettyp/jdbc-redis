@@ -1,22 +1,16 @@
 package br.com.svvs.jdbc.redis.test;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedMap;
 
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -29,780 +23,446 @@ import org.junit.Test;
 public class CommandsTest {
 
     private static Connection conn;
-    private static SortedMap<String,String> map;
     private static String keyPrefix;
 
-    // Not all keys will be retrieved from MGET since
-    // there's a size limit for the query.
-    // Issue 24 in Redis Database project.
-    private static int MAX_MGET_KEYS = 15;
-
     @BeforeClass
-    public static void connect() {
+    public static void connect() throws Exception {
         TestHelper t = TestHelper.getInstance();
         conn = t.getConnection();
-        map  = t.genKeyValContents();
         keyPrefix = t.get("keyPrefix");
-
-        // this is a setup and a SET test at
-        // the same time.
-        try {
-            Statement st = conn.createStatement();
-            for(String key : map.keySet()) {
-                st.execute("SET " + key + " " + map.get(key));
-                ResultSet rs = st.getResultSet();
-                while(rs.next()) {
-                    assertEquals("OK",rs.getString(0));
-                }
-            }
-            st.close();
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
     }
 
     @Test
-    public void set() {
-        // look at the BeforeClass method.
+    public void set() throws Exception {
+        String key = keyPrefix + "_SET";
+        assertEquals("OK", executeSingleStringResult("SET " + key + " value"));
+        assertEquals("value", retrieveValue(key));
+        delete(key);
     }
 
     @Test
-    public void get() {
-        try {
-            Statement st = conn.createStatement();
-            for(String key : map.keySet()) {
-                st.execute("GET " + key);
-                ResultSet rs = st.getResultSet();
-                while(rs.next()) {
-                    assertEquals(map.get(key), rs.getString(0));
-                }
-            }
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
+    public void get() throws Exception {
+        String key = keyPrefix + "_GET";
+        createValue(key, "value");
+        assertEquals("value", retrieveValue(key));
+        delete(key);
     }
 
     @Test
-    public void mget() {
-        try {
-            Statement st = conn.createStatement();
-            StringBuilder sb = new StringBuilder();
+    public void mget() throws Exception {
+        String key = keyPrefix + "_MGET";
+        createValue(key + 1, "value1");
+        createValue(key + 2, "value2");
 
-            int i = 0;
-            for(String key : map.keySet()) {
-                if(i++ >= MAX_MGET_KEYS) break;
-                sb.append(key + " ");
-            }
+        List<String> results = executeStringResults("MGET " + key + "1 " + key + "2");
 
-            ResultSet rs = st.executeQuery("MGET " + sb.toString());
+        assertEquals(2, results.size());
+        assertTrue(results.contains("value1"));
+        assertTrue(results.contains("value2"));
 
-            // put all in a list...
-            List<String> result = new ArrayList<String>();
-            while(rs.next()) {
-                result.add(rs.getString(0));
-            }
-
-            // convert expected values in a string array.
-            String[] expected = new String[MAX_MGET_KEYS];
-            // careful with these index stuff, only the MAX_MGET_KEYS should
-            // be created, in the same order that were stored.
-            i = 0;
-            for(String r : map.values().toArray(new String[0])) {
-                if(i >= MAX_MGET_KEYS) break;
-                expected[i] = r;
-                i++;
-            }
-
-            //check if all keys were retrieved through MGET
-            assertArrayEquals(expected, result.toArray(new String[0]));
-
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
+        delete(key + 1);
+        delete(key + 2);
     }
 
     @Test
-    public void setnx() {
-        try {
-            Statement st = conn.createStatement();
-            String prefix = keyPrefix;
-            // let's store store a non-existent key, which should be true as return.
-            ResultSet resultSet = st.executeQuery("SETNX " + prefix + "_SETNX_NON_EXISTENT_KEY value");
-            while(resultSet.next()) {
-                assertTrue(resultSet.getBoolean(0));
-            }
-            resultSet.close();
+    public void setnx() throws Exception {
+        String key = keyPrefix + "_SETNX_NON_EXISTENT_KEY";
+        // let's store store a non-existent key, which should be true as return.
+        assertTrue(executeSingleBooleanResult("SETNX " + key + " value"));
 
-            // now let's do it again, now SETNX should return false.
-            resultSet = st.executeQuery("SETNX " + prefix + "_SETNX_NON_EXISTENT_KEY value");
-            while(resultSet.next()) {
-                assertFalse(resultSet.getBoolean(0));
-            }
-            resultSet.close();
+        // now let's do it again, now SETNX should return false.
+        assertFalse(executeSingleBooleanResult("SETNX " + key + " value"));
 
-            // remove the test key..
-            conn.createStatement().execute("DEL " + prefix + "_SETNX_NON_EXISTENT_KEY");
-
-        } catch(SQLException e) {
-            fail(e.getMessage());
-        }
+        delete(key);
     }
 
     @Test
-    public void incr() {
-        try {
-            String key = keyPrefix + "_INCR_TEST_KEY";
-            ResultSet rs = conn.createStatement().executeQuery("INCR " + key);
-            while(rs.next()) {
-                assertEquals(1,rs.getInt(0));
-            }
-
-            // let's increment more times...
-            for(int i = 0; i < 999; i++) {
-                rs = conn.createStatement().executeQuery("INCR " + key);
-            }
-            // checking the result...
-            while(rs.next()) {
-                assertEquals(1000,rs.getInt(0));
-            }
-
-            conn.createStatement().executeQuery("DEL " + key); //cleanup.
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
+    public void incr() throws Exception {
+        String key = keyPrefix + "_INCR_TEST_KEY";
+        assertEquals(1,executeSingleIntegerResult("INCR " + key));
+        assertEquals(2,executeSingleIntegerResult("INCR " + key));
+        delete(key);
     }
 
     @Test
-    public void incrby() {
-        try {
-            String key = keyPrefix + "_INCRBY_TEST_KEY";
-            ResultSet rs = conn.createStatement().executeQuery("INCRBY " + key + " 1");
-            while(rs.next()) {
-                assertEquals(1,rs.getInt(0));
-            }
-
-            // let's increment more times...
-            for(int i = 0; i < 1000; i++) {
-                rs = conn.createStatement().executeQuery("INCRBY " + key + " 10");
-            }
-            // checking the result...
-            while(rs.next()) {
-                assertEquals(10001,rs.getInt(0));
-            }
-
-            conn.createStatement().executeQuery("DEL " + key); //cleanup.
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
+    public void incrby() throws Exception {
+        String key = keyPrefix + "_INCRBY_TEST_KEY";
+        assertEquals(2,executeSingleIntegerResult("INCRBY " + key + " 2"));
+        assertEquals(12,executeSingleIntegerResult("INCRBY " + key + " 10"));
+        delete(key);
     }
 
     @Test
-    public void decr() {
-        try {
-            String key = keyPrefix + "_DECR_TEST_KEY";
-            ResultSet rs = conn.createStatement().executeQuery("DECR " + key);
-            while(rs.next()) {
-                assertEquals(-1,rs.getInt(0));
-            }
-
-            // let's decrement more times...
-            for(int i = 0; i < 999; i++) {
-                rs = conn.createStatement().executeQuery("DECR " + key);
-            }
-            // checking the result...
-            while(rs.next()) {
-                assertEquals(-1000,rs.getInt(0));
-            }
-
-            conn.createStatement().executeQuery("DEL " + key); //cleanup.
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
+    public void decr() throws Exception {
+        String key = keyPrefix + "_DECR_TEST_KEY";
+        assertEquals(-1, executeSingleIntegerResult("DECR " + key));
+        assertEquals(-2, executeSingleIntegerResult("DECR " + key));
+        delete(key);
     }
 
     @Test
-    public void decrby() {
-        try {
-            String key = keyPrefix + "_DECRBY_TEST_KEY";
-            ResultSet rs = conn.createStatement().executeQuery("DECRBY " + key + " 1");
-            while(rs.next()) {
-                assertEquals(-1,rs.getInt(0));
-            }
-
-            // let's decrement more times...
-            for(int i = 0; i < 1000; i++) {
-                rs = conn.createStatement().executeQuery("DECRBY " + key + " 10");
-            }
-            // checking the result...
-            while(rs.next()) {
-                assertEquals(-10001,rs.getInt(0));
-            }
-
-            conn.createStatement().executeQuery("DEL " + key); //cleanup.
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
+    public void decrby() throws Exception{
+        String key = keyPrefix + "_DECRBY_TEST_KEY";
+        assertEquals(-1, executeSingleIntegerResult("DECRBY " + key + " 1"));
+        assertEquals(-11, executeSingleIntegerResult("DECRBY " + key + " 10"));
+        delete(key);
     }
 
     @Test
-    public void exists() {
-        try {
-            String key = keyPrefix + "_EXISTS_TEST_KEY";
-
-            ResultSet rs = conn.createStatement().executeQuery("EXISTS " + key);
-            while(rs.next()) assertFalse(rs.getBoolean(0)); // this key should not exists
-
-            // make this key exists...
-            conn.createStatement().execute("SET " + key + " value");
-
-            rs = conn.createStatement().executeQuery("EXISTS " + key);
-            while(rs.next()) assertTrue(rs.getBoolean(0)); // this key should exists
-
-            //cleanup
-            conn.createStatement().execute("DEL " + key);
-
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
+    public void exists() throws Exception {
+        String key = keyPrefix + "_EXISTS_TEST_KEY";
+        assertFalse(executeSingleBooleanResult("EXISTS " + key));
+        createValue(key, "value");
+        assertTrue(executeSingleBooleanResult("EXISTS " + key));
+        delete(key);
     }
 
     @Test
-    public void del() {
-        try {
-            String key = keyPrefix + "_DEL_TEST_KEY";
+    public void del() throws Exception {
+        String key = keyPrefix + "_DEL_TEST_KEY";
 
-            // trying to del a non existent key should return false.
-            ResultSet rs = conn.createStatement().executeQuery("DEL " + key);
-            while(rs.next()) assertFalse(rs.getBoolean(0)); // this key should not exists
+        // trying to del a non existent key should return false.
+        assertFalse(executeSingleBooleanResult("DEL " + key));
 
-            // make this key exists...
-            conn.createStatement().execute("SET " + key + " value");
+        // del a key should return true...
+        createValue(key, "value");
+        assertTrue(executeSingleBooleanResult("DEL " + key));
 
-            // del a key should return true...
-            rs = conn.createStatement().executeQuery("DEL " + key);
-            while(rs.next()) assertTrue(rs.getBoolean(0)); // this key should exists
-
-            // the deleted key should be a null if we try to get it after the del.
-            rs = conn.createStatement().executeQuery("GET " + key);
-            while(rs.next()) assertNull(rs.getString(0)); // this key should not exists
-
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
+        // the deleted key should be a null if we try to get it after the del.
+        assertNull(retrieveValue(key));
     }
 
     @Test
-    public void type() {
-        try {
-            String stringKey = keyPrefix + "_TYPE_STRING_TEST_KEY";
-            String listKey   = keyPrefix + "_TYPE_LIST_TEST_KEY";
-            String setKey   = keyPrefix  + "_TYPE_SET_TEST_KEY";
-            String nonKey   = keyPrefix  + "_TYPE_NONE_TEST_KEY";
+    public void type() throws Exception {
+        String stringKey = keyPrefix + "_TYPE_STRING_TEST_KEY";
+        String listKey   = keyPrefix + "_TYPE_LIST_TEST_KEY";
+        String setKey   = keyPrefix  + "_TYPE_SET_TEST_KEY";
+        String nonKey   = keyPrefix  + "_TYPE_NONE_TEST_KEY";
 
-            // create some possible types
-            conn.createStatement().execute("SET "   + stringKey + " value");
-            conn.createStatement().execute("LPUSH " + listKey   + " value");
-            conn.createStatement().execute("SADD "  + setKey    + " value");
+        // create some possible types
+        execute("SET " + stringKey + " value");
+        execute("LPUSH " + listKey + " value");
+        execute("SADD " + setKey + " value");
 
-            ResultSet rs = conn.createStatement().executeQuery("TYPE " + stringKey);
-            while(rs.next()) assertEquals("string", rs.getString(0));
+        assertEquals("string", executeSingleStringResult("TYPE " + stringKey));
+        assertEquals("list", executeSingleStringResult("TYPE " + listKey));
+        assertEquals("set", executeSingleStringResult("TYPE " + setKey));
+        assertEquals("none", executeSingleStringResult("TYPE " + nonKey));
 
-            rs = conn.createStatement().executeQuery("TYPE " + listKey);
-            while(rs.next()) assertEquals("list", rs.getString(0));
-
-            rs = conn.createStatement().executeQuery("TYPE " + setKey);
-            while(rs.next()) assertEquals("set", rs.getString(0));
-
-            rs = conn.createStatement().executeQuery("TYPE " + nonKey);
-            while(rs.next()) assertEquals("none", rs.getString(0));
-
-            //cleanup...
-            conn.createStatement().execute("DEL " + stringKey);
-            conn.createStatement().execute("DEL " + listKey);
-            conn.createStatement().execute("DEL " + setKey);
-
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
+        delete(stringKey);
+        delete(listKey);
+        delete(setKey);
     }
 
     @Test
-    public void keys() {
-        String keyGlob = keyPrefix + "_99*";
-        ResultSet rs;
-        try {
-            rs = conn.createStatement().executeQuery("KEYS " + keyGlob);
-            while(rs.next()) {
-                assertTrue(map.containsKey(rs.getString(0)));
-            }
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
-    }
-    /**
-     * Note that RANDOMKEY returns a random key from the database
-     * and not necessarily a key we know. If the database was empty
-     * this test will perform correctly otherwise it can fail.
-     */
-    @Test
-    public void randomkey() {
-        ResultSet rs;
-        try {
-            rs = conn.createStatement().executeQuery("RANDOMKEY");
-            while(rs.next()) {
-                assertTrue(map.containsKey(rs.getString(0)));
-            }
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
+    public void keys() throws Exception {
+        String key = keyPrefix + "_KEYS_1";
+        String keyGlob = keyPrefix + "_KEYS_1*";
+        createValue(key, "value");
+        assertEquals(key, executeSingleStringResult("KEYS " + keyGlob));
+        delete(key);
     }
 
     @Test
-    public void rename() {
+    public void randomkey() throws Exception {
+        String key = keyPrefix + "_RANDOMKEY";
+        createValue(key, "value");
+        assertEquals(key, executeSingleStringResult("RANDOMKEY"));
+        delete(key);
+    }
+
+    @Test
+    public void rename() throws Exception {
         String oldNameKey = keyPrefix + "_RENAME_TEST_OLD_KEY";
         String newNameKey = keyPrefix + "_RENAME_TEST_NEW_KEY";
 
-        ResultSet rs;
-        try {
-            // setting a test key...
-            conn.createStatement().execute("SET "    + oldNameKey + " value");
-            // now we rename it, it should destroy the old key.
-            conn.createStatement().execute("RENAME " + oldNameKey + " " + newNameKey);
+        createValue(oldNameKey, "value");
+        // now we rename it, it should destroy the old key.
+        execute("RENAME " + oldNameKey + " " + newNameKey);
 
-            // a get on the old key should return null.
-            rs = conn.createStatement().executeQuery("GET " + oldNameKey);
-            while(rs.next()) assertNull(rs.getString(0));
+        // a get on the old key should return null.
+        assertNull(retrieveValue(oldNameKey));
 
-            // the new key should be defined and with out value.
-            rs = conn.createStatement().executeQuery("GET " + newNameKey);
-            while(rs.next()) assertEquals("value", rs.getString(0));
+        // the new key should be defined and with out value.
+        assertEquals("value", retrieveValue(newNameKey));
 
-            // cleanup
-            conn.createStatement().execute("DEL " + newNameKey);
-
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
-
+        delete(newNameKey);
     }
 
     @Test
-    public void renamenx() {
+    public void renamenx() throws Exception {
         String oldNameKey = keyPrefix + "_RENAMENX_TEST_OLD_KEY";
         String newNameKey = keyPrefix + "_RENAMENX_TEST_NEW_KEY";
 
-        ResultSet rs;
-        try {
-            // setting a test key...
-            conn.createStatement().execute("SET " + oldNameKey + " value");
+        // setting a test key...
+        createValue(oldNameKey, "value");
 
-            // now we rename it, it should destroy the old key and return true.
-            rs = conn.createStatement().executeQuery("RENAMENX " + oldNameKey + " " + newNameKey);
-            while(rs.next()) assertTrue(rs.getBoolean(0));
+        // now we rename it, it should destroy the old key and return true.
+        assertTrue(executeSingleBooleanResult("RENAMENX " + oldNameKey + " " + newNameKey));
 
-            // a get on the old key should return null.
-            rs = conn.createStatement().executeQuery("GET " + oldNameKey);
-            while(rs.next()) assertNull(rs.getString(0));
+        // a get on the old key should return null.
+        assertNull(retrieveValue(oldNameKey));
 
-            // the new key should be defined and with out value.
-            rs = conn.createStatement().executeQuery("GET " + newNameKey);
-            while(rs.next()) assertEquals("value", rs.getString(0));
+        // the new key should be defined and with out value.
+        assertEquals("value", retrieveValue(newNameKey));
 
-            // now let's set the old one again
-            conn.createStatement().execute("SET " + oldNameKey + " value");
+        // now let's set the old one again
+        createValue(oldNameKey, "value");
 
-            // the new key already exists and renamenx should return false.
-            rs = conn.createStatement().executeQuery("RENAMENX " + oldNameKey + " " + newNameKey);
-            while(rs.next()) assertFalse(rs.getBoolean(0));
+        // the new key already exists and renamenx should return false.
+        assertFalse(executeSingleBooleanResult("RENAMENX " + oldNameKey + " " + newNameKey));
 
-            // cleanup
-            conn.createStatement().execute("DEL " + oldNameKey);
-            conn.createStatement().execute("DEL " + newNameKey);
-
-        } catch (SQLException e) {
-
-            fail(e.getMessage());
-        }
-
-    }
-
-    /**
-     * This test will work on a empty Redis instance.
-     */
-    @Test
-    public void dbsize() {
-        // dbsize depends of how many keys we have in
-        // our test map, so we use map.size()
-        ResultSet rs;
-        try {
-            rs = conn.createStatement().executeQuery("DBSIZE");
-            while(rs.next()) {
-                assertEquals(map.size(), rs.getInt(0));
-            }
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
+        delete(oldNameKey);
+        delete(newNameKey);
     }
 
     @Test
-    public void expire() {
+    public void dbsize() throws Exception {
+        assertEquals(0, executeSingleIntegerResult("DBSIZE"));
+    }
+
+    @Test
+    public void expire() throws Exception {
         String key = keyPrefix + "_EXPIRE_TEST_KEY";
-        ResultSet rs;
+
+        createValue(key, "value");
+
+        // set it to expire in one seconds...
+        execute("EXPIRE " + key + " 1");
+
+        // sleep a little so Redis can remove the key in time.
         try {
-            // create a key...
-            conn.createStatement().execute("INCR " + key);
-
-            // the key should exists.
-            rs = conn.createStatement().executeQuery("GET " + key);
-            while(rs.next()) assertNotNull(rs.getString(0));
-
-            // set it to expire in one seconds...
-            conn.createStatement().execute("EXPIRE " + key + " 1");
-
-            // sleep a little so Redis can remove the key in time.
-            try {
-                Thread.sleep(2000); // two seconds
-            }
-            catch (InterruptedException e) {
-                fail(e.getMessage());
-            }
-
-            // the key should not exists anymore.
-            rs = conn.createStatement().executeQuery("GET " + key);
-            while(rs.next()) assertNull(rs.getString(0));
-
-        } catch (SQLException e) {
+            Thread.sleep(2000); // two seconds
+        }
+        catch (InterruptedException e) {
             fail(e.getMessage());
         }
 
+        // the key should not exists anymore.
+        assertNull(retrieveValue(key));
     }
 
     @Test
-    public void rpush() {
+    public void rpush() throws Exception {
         String key = keyPrefix + "_RPUSH_TEST_KEY";
-        try {
-            // let's push two elements
-            conn.createStatement().execute("RPUSH " + key + " first");
-            conn.createStatement().execute("RPUSH " + key + " second");
-
-            // now the second element should be in last position
-            ResultSet rs = conn.createStatement().executeQuery("LINDEX " + key + " 1");
-            while(rs.next()) assertEquals("second", rs.getString(0));
-
-            //cleanup
-            conn.createStatement().execute("DEL " + key);
-
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
+        execute("RPUSH " + key + " first");
+        execute("RPUSH " + key + " second");
+        assertEquals("second", executeSingleStringResult("LINDEX " + key + " 1"));
+        delete(key);
     }
 
     @Test
-    public void lpush() {
+    public void lpush() throws Exception {
         String key = keyPrefix + "_LPUSH_TEST_KEY";
-        try {
-            // let's push two elements
-            conn.createStatement().execute("LPUSH " + key + " first");
-            conn.createStatement().execute("LPUSH " + key + " second");
-
-            // now the first element should be in last position
-            ResultSet rs = conn.createStatement().executeQuery("LINDEX " + key + " 1");
-            while(rs.next()) assertEquals("first", rs.getString(0));
-
-            //cleanup
-            conn.createStatement().execute("DEL " + key);
-
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
+        execute("LPUSH " + key + " first");
+        execute("LPUSH " + key + " second");
+        assertEquals("first", executeSingleStringResult("LINDEX " + key + " 1"));
+        delete(key);
     }
 
     @Test
-    public void llen() {
+    public void llen() throws Exception {
         String key = keyPrefix + "_LLEN_TEST_KEY";
-        try {
-            // let's push two elements
-            conn.createStatement().execute("RPUSH " + key + " first");
-            conn.createStatement().execute("RPUSH " + key + " second");
-
-            // this list should have two elements.
-            ResultSet rs = conn.createStatement().executeQuery("LLEN " + key);
-            while(rs.next()) assertEquals(2, rs.getInt(0));
-
-            //cleanup
-            conn.createStatement().execute("DEL " + key);
-
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
+        execute("RPUSH " + key + " first");
+        execute("RPUSH " + key + " second");
+        assertEquals(2, executeSingleIntegerResult("LLEN " + key));
+        delete(key);
     }
 
     @Test
-    public void lrange() {
+    public void lrange() throws Exception {
         String key = keyPrefix + "_LRANGE_TEST_KEY";
-        try {
-            // let's push two elements
-            conn.createStatement().execute("LPUSH " + key + " first");
-            conn.createStatement().execute("LPUSH " + key + " second");
 
-            String[] result = new String[]{"first","second"};
+        execute("LPUSH " + key + " first");
+        execute("LPUSH " + key + " second");
 
-            // this list should have two elements.
-            ResultSet rs = conn.createStatement().executeQuery("LRANGE " + key + " 1 2");
-            int i = 0;
-            while(rs.next()) {
-                assertEquals(result[i], rs.getString(0));
-                i++;
-            }
+        List<String> results = executeStringResults("LRANGE " + key + " 1 2");
+        assertEquals(1, results.size());
+        assertEquals("first", results.get(0));
 
-            //cleanup
-            conn.createStatement().execute("DEL " + key);
-
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
+        delete(key);
     }
 
     @Test
-    public void ltrim() {
+    public void ltrim() throws Exception {
         String key = keyPrefix + "_LTRIM_TEST_KEY";
-        try {
-            // let's push two elements
-            conn.createStatement().execute("RPUSH " + key + " first");
-            conn.createStatement().execute("RPUSH " + key + " second");
-            conn.createStatement().execute("RPUSH " + key + " third");
+        execute("RPUSH " + key + " first");
+        execute("RPUSH " + key + " second");
+        execute("RPUSH " + key + " third");
 
-            // trim out
-            conn.createStatement().execute("LTRIM " + key + " 0 1");
+        execute("LTRIM " + key + " 0 1");
 
-            String[] r = new String[]{"first","second"};
+        List<String> results = executeStringResults("LRANGE " + key + " 0 2");
+        assertEquals(2, results.size());
+        assertEquals("first", results.get(0));
+        assertEquals("second", results.get(1));
 
-            // this list should have two elements.
-            ResultSet rs = conn.createStatement().executeQuery("LRANGE " + key + " 0 2");
-            int i = 0;
-            while(rs.next()) {
-                assertEquals(r[i], rs.getString(0));
-                i++;
-            }
-
-            //cleanup
-            conn.createStatement().execute("DEL " + key);
-
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
+        delete(key);
     }
 
     @Test
-    public void lpop() {
+    public void lpop() throws Exception {
         String key = keyPrefix + "_LPOP_TEST_KEY";
-        try {
-            // let's push two elements
-            conn.createStatement().execute("RPUSH " + key + " first");
-            conn.createStatement().execute("RPUSH " + key + " second");
-            conn.createStatement().execute("RPUSH " + key + " third");
+        execute("RPUSH " + key + " first");
+        execute("RPUSH " + key + " second");
+        execute("RPUSH " + key + " third");
 
-            String[] r = new String[]{"first","second","third"};
+        String[] r = new String[]{"first","second","third"};
 
-            for(int i = 0; i < r.length; i++) {
-                ResultSet rs = conn.createStatement().executeQuery("LPOP " + key);
-                while(rs.next()) {
-                    assertEquals(r[i], rs.getString(0));
-                }
-            }
-
-            //cleanup
-            conn.createStatement().execute("DEL " + key);
-
-        } catch (SQLException e) {
-            fail(e.getMessage());
+        for(int i = 0; i < r.length; i++) {
+            assertEquals(r[i], executeSingleStringResult("LPOP " + key));
         }
+
+        delete(key);
     }
 
     @Test
-    public void rpop() {
+    public void rpop() throws Exception {
         String key = keyPrefix + "_RPOP_TEST_KEY";
-        try {
-            // let's push two elements
-            conn.createStatement().execute("RPUSH " + key + " first");
-            conn.createStatement().execute("RPUSH " + key + " second");
-            conn.createStatement().execute("RPUSH " + key + " third");
+        execute("RPUSH " + key + " first");
+        execute("RPUSH " + key + " second");
+        execute("RPUSH " + key + " third");
 
-            String[] r = new String[]{"third","second","first"};
+        String[] r = new String[]{"third","second","first"};
 
-            for(int i = 0; i < r.length; i++) {
-                ResultSet rs = conn.createStatement().executeQuery("RPOP " + key);
-                while(rs.next()) {
-                    assertEquals(r[i], rs.getString(0));
-                }
-            }
-
-            //cleanup
-            conn.createStatement().execute("DEL " + key);
-
-        } catch (SQLException e) {
-            fail(e.getMessage());
+        for (int i = 0; i < r.length; i++) {
+            assertEquals(r[i], executeSingleStringResult("RPOP " + key));
         }
+
+        delete(key);
     }
 
     @Test
-    public void lset() {
+    public void lset() throws Exception {
         String key = keyPrefix + "_LSET_TEST_KEY";
-        try {
-            // let's push two elements
-            conn.createStatement().execute("RPUSH " + key + " first");
-            conn.createStatement().execute("RPUSH " + key + " second");
-            conn.createStatement().execute("RPUSH " + key + " third");
+        execute("RPUSH " + key + " first");
+        execute("RPUSH " + key + " second");
+        execute("RPUSH " + key + " third");
 
-            String[] r = new String[]{"first","second","new_third"};
+        String[] r = new String[]{"first","second","new_third"};
 
-            conn.createStatement().execute("LSET " + key + " 2 new_third");
+        execute("LSET " + key + " 2 new_third");
 
-            for(int i = 0; i < r.length; i++) {
-                ResultSet rs = conn.createStatement().executeQuery("LPOP " + key);
-                while(rs.next()) {
-                    assertEquals(r[i], rs.getString(0));
-                }
-            }
-
-            //cleanup
-            conn.createStatement().execute("DEL " + key);
-
-        } catch (SQLException e) {
-            fail(e.getMessage());
+        for (int i = 0; i < r.length; i++) {
+            assertEquals(r[i], executeSingleStringResult("LPOP " + key));
         }
+
+        delete(key);
     }
 
     @Test
-    public void lrem() {
+    public void lrem() throws Exception {
         String key = keyPrefix + "_LREM_TEST_KEY";
-        try {
-            // let's push two elements
-            conn.createStatement().execute("RPUSH " + key + " first");
-            conn.createStatement().execute("RPUSH " + key + " second");
-            conn.createStatement().execute("RPUSH " + key + " third");
+        execute("RPUSH " + key + " first");
+        execute("RPUSH " + key + " second");
+        execute("RPUSH " + key + " third");
 
-            String[] r = new String[]{"first","third"};
+        String[] r = new String[]{"first","third"};
 
-            conn.createStatement().execute("LREM " + key + " 1 second");
+        execute("LREM " + key + " 1 second");
 
-            for(int i = 0; i < r.length; i++) {
-                ResultSet rs = conn.createStatement().executeQuery("LPOP " + key);
-                while(rs.next()) {
-                    assertEquals(r[i], rs.getString(0));
-                }
-            }
-
-            //cleanup
-            conn.createStatement().execute("DEL " + key);
-
-        } catch (SQLException e) {
-            fail(e.getMessage());
+        for (int i = 0; i < r.length; i++) {
+            assertEquals(r[i], executeSingleStringResult("LPOP " + key));
         }
+
+        delete(key);
     }
 
     @Test
-    public void append() {
-        try {
-            Statement st = conn.createStatement();
-            String prefix = keyPrefix;
-            // let's append a non-existent key
-            ResultSet resultSet = st.executeQuery("APPEND " + prefix + "_APPEND value");
-            while(resultSet.next()) {
-                assertEquals(5, resultSet.getInt(0));
-            }
-            resultSet.close();
-
-            // now let's append to that key
-            resultSet = st.executeQuery("APPEND " + prefix + "_APPEND s");
-            while(resultSet.next()) {
-                assertEquals(6, resultSet.getInt(0));
-            }
-            resultSet.close();
-
-            resultSet = st.executeQuery("GET " + prefix + "_APPEND");
-            while(resultSet.next()) {
-                assertEquals("values", resultSet.getString(0));
-            }
-
-            // remove the test key..
-            conn.createStatement().execute("DEL " + prefix + "_APPEND");
-
-        } catch(SQLException e) {
-            fail(e.getMessage());
-        }
+    public void append() throws Exception {
+        String key = keyPrefix + "_APPEND";
+        assertEquals(5, executeSingleIntegerResult("APPEND " + key + " value"));
+        assertEquals(6, executeSingleIntegerResult("APPEND " + key + " s"));
+        assertEquals("values", retrieveValue(key));
+        delete(key);
     }
 
     @Test
-    public void mset() {
-        try {
-            Statement st = conn.createStatement();
-            String prefix = keyPrefix;
-            // let's add multiple keys
-            ResultSet resultSet = st.executeQuery("MSET " + prefix + "_MSET1 value1 "
-                    + prefix + "_MSET2 value2");
-            while(resultSet.next()) {
-                assertEquals("OK", resultSet.getString(0));
-            }
-            resultSet.close();
+    public void mset() throws Exception {
+        assertEquals("OK", executeSingleStringResult("MSET " + keyPrefix + "_MSET1 value1 "
+                + keyPrefix + "_MSET2 value2"));
 
-            resultSet = st.executeQuery("GET " + prefix + "_MSET1");
-            while(resultSet.next()) {
-                assertEquals("value1", resultSet.getString(0));
-            }
-            resultSet.close();
+        assertEquals("value1", retrieveValue(keyPrefix + "_MSET1"));
+        assertEquals("value2", retrieveValue(keyPrefix + "_MSET2"));
 
-            resultSet = st.executeQuery("GET " + prefix + "_MSET2");
-            while(resultSet.next()) {
-                assertEquals("value2", resultSet.getString(0));
-            }
-            resultSet.close();
-
-            // remove the test key..
-            conn.createStatement().execute("DEL " + prefix + "_MSET1");
-            conn.createStatement().execute("DEL " + prefix + "_MSET2");
-
-        } catch(SQLException e) {
-            fail(e.getMessage());
-        }
+        delete(keyPrefix + "_MSET1");
+        delete(keyPrefix + "_MSET2");
     }
 
     @Test
-    public void getset() {
-        try {
-            Statement st = conn.createStatement();
-            String prefix = keyPrefix;
-            // let's add multiple keys
-            ResultSet resultSet = st.executeQuery("SET " + prefix + "_GETSET value");
-            while(resultSet.next()) {
-                assertEquals("OK", resultSet.getString(0));
-            }
-            resultSet.close();
-
-            resultSet = st.executeQuery("GETSET " + prefix + "_GETSET value1");
-            while(resultSet.next()) {
-                assertEquals("value", resultSet.getString(0));
-            }
-            resultSet.close();
-
-            // remove the test key..
-            conn.createStatement().execute("DEL " + prefix + "_GETSET");
-
-        } catch(SQLException e) {
-            fail(e.getMessage());
-        }
+    public void getset() throws Exception {
+        String key = keyPrefix + "_GETSET";
+        createValue(key, "value");
+        assertEquals("value", executeSingleStringResult("GETSET " + key + " value1"));
+        assertEquals("value1", retrieveValue(key));
+        delete(key);
     }
 
+    private void execute(final String command) throws Exception {
+        conn.createStatement().execute(command);
+    }
 
-    @AfterClass
-    public static void clean() {
-        for(String key : map.keySet()) {
-            try {
-                conn.createStatement().execute("DEL " + key);
-            } catch (SQLException e) {
-                fail(e.getMessage());
-            }
+    private ResultSet executeQuery(final String command) throws Exception {
+        return conn.createStatement().executeQuery(command);
+    }
+
+    private void createValue(String key, String value) throws Exception {
+        execute("SET " + key + " " + value);
+    }
+
+    private String retrieveValue(String key) throws Exception {
+        return executeSingleStringResult("GET " + key);
+    }
+
+    private void delete(final String key) throws Exception {
+        execute("DEL " + key);
+    }
+
+    private String executeSingleStringResult(final String command) throws Exception {
+        List<String> results = executeStringResults(command);
+        assertEquals(1, results.size());
+        return results.get(0);
+    }
+
+    private int executeSingleIntegerResult(final String command) throws Exception {
+        List<Integer> results = executeIntegerResults(command);
+        assertEquals(1, results.size());
+        return results.get(0);
+    }
+
+    private Boolean executeSingleBooleanResult(final String command) throws Exception {
+        List<Boolean> results = executeBooleanResults(command);
+        assertEquals(1, results.size());
+        return results.get(0);
+    }
+
+    private List<String> executeStringResults(final String command) throws Exception {
+        return executeSingleResult(command, (rs, x) -> rs.getString(x));
+    }
+
+    private List<Integer> executeIntegerResults(final String command) throws Exception {
+        return executeSingleResult(command, (rs, x) -> rs.getInt(x));
+    }
+
+    private List<Boolean> executeBooleanResults(final String command) throws Exception {
+        return executeSingleResult(command, (rs, x) -> rs.getBoolean(x));
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private <T> List<T> executeSingleResult(final String command, Retrieve<T> operation) throws Exception {
+        ResultSet result = executeQuery(command);
+
+        List results = new ArrayList();
+        while(result.next()) {
+            results.add(operation.query(result, 0));
         }
+        result.close();
+
+        return results;
+    }
+
+    interface Retrieve<T> {
+        T query(ResultSet rs, int index) throws Exception;
     }
 
 }
