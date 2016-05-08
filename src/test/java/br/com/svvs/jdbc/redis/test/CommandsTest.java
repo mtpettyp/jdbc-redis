@@ -255,6 +255,20 @@ public class CommandsTest {
         assertNull(retrieveValue(key));
     }
 
+    @Test
+    public void ttl() throws Exception {
+        String key = keyPrefix + "_TTL_TEST_KEY";
+
+        createValue(key, "value");
+
+        execute("EXPIRE " + key + " 10");
+
+        int timeout = executeSingleIntegerResult("TTL " + key);
+        assertTrue("Timeout is between 10 and 0", timeout >= 0 && timeout <= 10);
+
+        delete(key);
+    }
+
 
     @Test
     public void rpush() throws Exception {

@@ -237,7 +237,7 @@ The following is the list of currently supported statements:
 | SUNIONSTORE | :x: |
 | SYNC | :x: |
 | TIME | :x: |
-| TTL | :x: |
+| TTL | :white_check_mark: |
 | TYPE | :white_check_mark: |
 | UNSUBSCRIBE | :x: |
 | UNWATCH | :x: |
