@@ -243,6 +243,20 @@ public class CommandsTest {
     }
 
     @Test
+    public void expireat() throws Exception {
+        String key = keyPrefix + "_EXPIREAT_TEST_KEY";
+
+        createValue(key, "value");
+
+        // set it to expire in one second...
+        execute("EXPIREAT " + key + " 1293840000");
+
+        // the key should not exists anymore.
+        assertNull(retrieveValue(key));
+    }
+
+
+    @Test
     public void rpush() throws Exception {
         String key = keyPrefix + "_RPUSH_TEST_KEY";
         execute("RPUSH " + key + " first");

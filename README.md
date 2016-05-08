@@ -124,7 +124,7 @@ The following is the list of currently supported statements:
 | EXEC | :x: |
 | EXISTS | :white_check_mark: |
 | EXPIRE | :white_check_mark: |
-| EXPIREAT | :x: |
+| EXPIREAT | :white_check_mark: |
 | FLUSHALL | :white_check_mark: |
 | FLUSHDB | :white_check_mark: |
 | GEOADD | :x: |
