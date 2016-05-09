@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/mtpettyp/jdbc-redis.svg?branch=master)](https://travis-ci.org/mtpettyp/jdbc-redis)
-
+[![Coverage Status](http://img.shields.io/coveralls/mtpettyp/jdbc-redis/master.svg?style=flat-square)](https://coveralls.io/r/mtpettyp/jdbc-redis?branch=master)
 
 
 jdbc-redis is an effort to implement the JDBC API for Redis. 

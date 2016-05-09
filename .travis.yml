@@ -1,8 +1,20 @@
 language: java
-script: mvn clean verify
+
 notifications:
   email: false
-jdk: 
+
+env:
+  global:
+    secure: BD/hBEPlu+ualPaR61fj/3+Jht0r/8aovlsbtZpp3frLj7cyOZuqIoJiruRhmOoSFowen50c5gabw52Seqlb1TpRq2P7mwwgzAg22kKknATxo2czkkEK1tgzuou7hfEf017gKcnVJ9JBWrDfJvvP/d5Et60Uu8qv4DRFNzxa/dpqE6E9h2GcNBoVp8FgDenDm/YsxWA4MUZnuwHhRv13ba7+eKQaDjPiw4h6tCgpDdTHdCoBhYN3lDwb6Db9kp+O9G07kH0lF0o9ujsF6zKvMfenGrhDy7oxG0AwH9v5hrPDcNNx8AdApNvBtxR0bv4j12LqT87eqgsoLvIpCRE3y31CGcUS3sSiiVJAAEKRxCCkPxJt9m08WHQIXgoeJffvcrbxpQynRQu7gRPGG+op7nVDfz2wJkFbtdFcGtRWjup5YFUmGc2cEiZtTwj59RVhKJ+gOWW2xJ18HdcjivEK4/KLdGxmP2ZM/WTolAutLH7D7dkHGOUbbK7k/5It+xvHQrT5RNAADyk/1fku6UqaK+kANuoABxins4gVa0TUSZI3v8YADxVgLlQ9Y1SNeZKezDH7ZagF+98+Jl7KAHRB1heiMmsTI7kbV0N9DUHskaJ/khDFEvFadX5mxt8eTrJZgz5JQQxlgNAxFQLIQ3hfvKHgIAsouiNNlyF2SnhZpAY=
+
+jdk:
   - oraclejdk8
+
+script: mvn clean verify
+
 services:
   - redis-server
+
+after_success:
+  - mvn jacoco:report coveralls:jacoco
+
