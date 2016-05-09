@@ -177,14 +177,14 @@ The following is the list of currently supported statements:
 | OBJECT | :x: |
 | PERSIST | :x: |
 | PEXPIRE | :x: |
-| PEXPIREAT | :x: |
+| PEXPIREAT | :white_check_mark: |
 | PFADD | :x: |
 | PFCOUNT | :x: |
 | PFMERGE | :x: |
 | PING | :x: |
 | PSETEX | :x: |
 | PSUBSCRIBE | :x: |
-| PTTL | :x: |
+| PTTL | :white_check_mark: |
 | PUBLISH | :x: |
 | PUBSUB | :x: |
 | PUNSUBSCRIBE | :x: |

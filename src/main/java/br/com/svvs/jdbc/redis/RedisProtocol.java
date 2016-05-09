@@ -601,6 +601,32 @@ public enum RedisProtocol implements RedisMessageHandler {
             return this.digester.parseResultMessage(msg);
         }
 
+    },
+    PTTL(new RedisSimpleDigester("PTTL")) {
+
+        @Override
+        public String createMsg(String msg) throws RedisParseException {
+            return this.digester.createSimpleCommand(msg);
+        }
+
+        @Override
+        public String[] parseMsg(String msg) throws RedisResultException {
+            return this.digester.parseResultMessage(msg);
+        }
+
+    },
+    PEXPIRE(new RedisSimpleDigester("PEXPIRE")) {
+
+        @Override
+        public String createMsg(String msg) throws RedisParseException {
+            return this.digester.createSimpleCommand(msg);
+        }
+
+        @Override
+        public String[] parseMsg(String msg) throws RedisResultException {
+            return this.digester.parseResultMessage(msg);
+        }
+
     };
 
     // message digester

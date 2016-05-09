@@ -243,6 +243,27 @@ public class CommandsTest {
     }
 
     @Test
+    public void pexpire() throws Exception {
+        String key = keyPrefix + "_PEXPIRE_TEST_KEY";
+
+        createValue(key, "value");
+
+        // set it to expire in one seconds...
+        execute("PEXPIRE " + key + " 1000");
+
+        // sleep a little so Redis can remove the key in time.
+        try {
+            Thread.sleep(2000); // two seconds
+        }
+        catch (InterruptedException e) {
+            fail(e.getMessage());
+        }
+
+        // the key should not exists anymore.
+        assertNull(retrieveValue(key));
+    }
+
+    @Test
     public void expireat() throws Exception {
         String key = keyPrefix + "_EXPIREAT_TEST_KEY";
 
@@ -265,6 +286,20 @@ public class CommandsTest {
 
         int timeout = executeSingleIntegerResult("TTL " + key);
         assertTrue("Timeout is between 10 and 0", timeout >= 0 && timeout <= 10);
+
+        delete(key);
+    }
+
+    @Test
+    public void pttl() throws Exception {
+        String key = keyPrefix + "_PTTL_TEST_KEY";
+
+        createValue(key, "value");
+
+        execute("PEXPIRE " + key + " 10000");
+
+        int timeout = executeSingleIntegerResult("PTTL " + key);
+        assertTrue("Timeout is between 10 and 0", timeout >= 0 && timeout <= 10000);
 
         delete(key);
     }
