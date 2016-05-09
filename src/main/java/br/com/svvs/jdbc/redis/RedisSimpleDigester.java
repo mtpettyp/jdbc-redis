@@ -3,7 +3,7 @@ package br.com.svvs.jdbc.redis;
 public class RedisSimpleDigester implements RedisDigester {
 
     private final String command;
-    private final String terminator = "\r\n";
+    private static final String TERMINATOR = "\r\n";
 
     public RedisSimpleDigester(String cmd) {
         if(cmd == null)
@@ -25,28 +25,22 @@ public class RedisSimpleDigester implements RedisDigester {
         // this is still valid.
         if(s.length == 1) {
             bytes = 0L;
-            return command + " " + s[0] + " " + bytes + terminator + terminator;
+            return command + " " + s[0] + " " + bytes + TERMINATOR + TERMINATOR;
         }
         else {
             bytes = s[1].length();
-            return command + " " + s[0] + " " + bytes + terminator + s[1] + terminator;
+            return command + " " + s[0] + " " + bytes + TERMINATOR + s[1] + TERMINATOR;
         }
 
     }
 
-    /* (non-Javadoc)
-     * @see br.com.svvs.jdbc.redis.RedisDigesterI#createSimpleCommand(java.lang.String)
-     */
     @Override
-	public String createSimpleCommand(final String msg) throws RedisParseException {
-        return command + " " + msg + terminator;
+    public String createSimpleCommand(final String msg) throws RedisParseException {
+        return command + " " + msg + TERMINATOR;
     }
 
-    /* (non-Javadoc)
-     * @see br.com.svvs.jdbc.redis.RedisDigesterI#parseResultMessage(java.lang.String)
-     */
     @Override
-	public String[] parseResultMessage(final String msg) throws RedisResultException {
+    public String[] parseResultMessage(final String msg) throws RedisResultException {
 
         // message without the type character.
         String message = msg.substring(1);
@@ -79,7 +73,7 @@ public class RedisSimpleDigester implements RedisDigester {
 
     private String[] passeMultiBulkData(final String message) throws RedisResultException {
 
-        String[] r = message.split(terminator);
+        String[] r = message.split(TERMINATOR);
 
         String[] result;
         if(r.length > 1) {
@@ -108,7 +102,7 @@ public class RedisSimpleDigester implements RedisDigester {
 
     private String[] parseBulkData(final String message) throws RedisResultException {
 
-        String[] r = message.split(terminator,2);
+        String[] r = message.split(TERMINATOR,2);
 
         if(r.length == 1 || Integer.parseInt(r[0]) == -1) {
             return new String[]{null}; // key not found, null result.
@@ -123,11 +117,8 @@ public class RedisSimpleDigester implements RedisDigester {
         return s.substring(0,s.length() - 2);
     }
 
-    /* (non-Javadoc)
-     * @see br.com.svvs.jdbc.redis.RedisDigesterI#createBulkWithParamCommand(java.lang.String, int)
-     */
     @Override
-	public String createBulkCommand(String msg, int i) throws RedisParseException {
+    public String createBulkCommand(String msg, int i) throws RedisParseException {
 
         String[] s = msg.trim().split(" ",i - 1);
 
@@ -145,7 +136,7 @@ public class RedisSimpleDigester implements RedisDigester {
             sb.append(s[j] + " ");
         }
 
-        sb.append(bytes + terminator + s[s.length - 1] + terminator);
+        sb.append(bytes + TERMINATOR + s[s.length - 1] + TERMINATOR);
 
         return sb.toString();
     }
