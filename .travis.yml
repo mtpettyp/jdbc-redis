@@ -16,5 +16,5 @@ services:
   - redis-server
 
 after_success:
-  - mvn jacoco:report coveralls:jacoco
+  - mvn jacoco:report coveralls:report
 
