@@ -431,7 +431,7 @@ public enum RedisProtocol implements RedisMessageHandler {
             return this.digester.parseResultMessage(msg);
         }
     },
-    FLUSHALL(new RedisSimpleDigester("FLUSHDB")){
+    FLUSHALL(new RedisSimpleDigester("FLUSHALL")){
         @Override
         public String createMsg(String msg) throws RedisParseException {
             return this.digester.createSimpleCommand(msg);
