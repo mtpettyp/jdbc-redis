@@ -23,25 +23,25 @@ import java.util.concurrent.Executor;
 
 public class RedisConnection implements java.sql.Connection {
 
+    private static final String NOT_SUPPORTED = "This operation is not supported by Redis or this driver. (%s)";
+    private static final String PROPERTY_PASSWORD = "password";
+
     private RedisIO io = null;
     private boolean isClosed = true;
 
-    private final String NOT_SUPPORTED = "This operation is not supported by Redis or this driver. (%s)";
+    public RedisConnection(final RedisIO io, final Properties info) throws SQLException {
 
-    public RedisConnection(RedisIO io, Properties info) throws SQLException {
-
-        if(io == null)
+        if(io == null) {
             throw new RuntimeException("Null RedisIO handler.");
+        }
         this.io = io;
 
         // we got a connection, let's try to authenticate
-        if(info != null && info.getProperty("password") != null &&
-                info.getProperty("password").length() > 0) {
+        if(info != null && info.getProperty(PROPERTY_PASSWORD) != null &&
+                info.getProperty(PROPERTY_PASSWORD).length() > 0) {
             try {
-                String response = this.io.sendRaw(RedisProtocol.AUTH.createMsg(info.getProperty("password")));
-                RedisProtocol.AUTH.parseMsg(response); // will throw RedisResultException if pass is invalid.
-            } catch (IOException e) {
-                throw new SQLException(e);
+                RedisCommandProcessor.runCommand(this, RedisCommand.AUTH.toString() + " "
+                        + info.getProperty("password"));
             } catch (RedisParseException e) {
                 throw new SQLException(e);
             } catch (RedisResultException e) {
@@ -49,7 +49,7 @@ public class RedisConnection implements java.sql.Connection {
             }
         }
 
-        this.isClosed = false;
+        isClosed = false;
     }
 
     @Override
@@ -64,12 +64,10 @@ public class RedisConnection implements java.sql.Connection {
      */
     @Override
     public void close() throws SQLException {
-        this.isClosed = true;
+        isClosed = true;
         try {
-            this.io.sendRaw(RedisProtocol.QUIT.createMsg(null));
-            this.io.close();
-        } catch (RedisParseException e) {
-            throw new SQLException(e);
+            io.sendRaw(RedisCommand.QUIT.toString());
+            io.close();
         } catch (IOException e) {
             throw new SQLException(e);
         }
@@ -80,12 +78,10 @@ public class RedisConnection implements java.sql.Connection {
      */
     @Override
     public void commit() throws SQLException {
-        this.checkConnection();
+        checkConnection();
         try {
-            this.io.sendRaw(RedisProtocol.SAVE.createMsg(null));
+            io.sendRaw(RedisCommand.SAVE.toString());
         } catch (IOException e) {
-            throw new SQLException(e);
-        } catch (RedisParseException e) {
             throw new SQLException(e);
         }
     }
@@ -145,7 +141,7 @@ public class RedisConnection implements java.sql.Connection {
 
     @Override
     public String getCatalog() throws SQLException {
-        this.checkConnection(); // as API spec says throw exception if conn is closed.
+        checkConnection(); // as API spec says throw exception if conn is closed.
         return null;
     }
 
@@ -186,7 +182,7 @@ public class RedisConnection implements java.sql.Connection {
 
     @Override
     public boolean isClosed() throws SQLException {
-        return this.isClosed;
+        return isClosed;
     }
 
     @Override
@@ -196,7 +192,7 @@ public class RedisConnection implements java.sql.Connection {
 
     @Override
     public boolean isValid(int arg0) throws SQLException {
-        return this.isClosed;
+        return isClosed;
     }
 
     @Override
@@ -275,8 +271,9 @@ public class RedisConnection implements java.sql.Connection {
 
     @Override
     public void setAutoCommit(boolean autoCommit) throws SQLException {
-        if(autoCommit == false)
+        if (!autoCommit) {
             throw new SQLFeatureNotSupportedException(unsupportedMethod("setAutoCommit(Z)V"));
+        }
     }
 
     @Override
@@ -331,19 +328,20 @@ public class RedisConnection implements java.sql.Connection {
 
     protected String msgToServer(String redisMsg) throws SQLException {
 
-        this.checkConnection(); // check if we can send the message.
+        checkConnection(); // check if we can send the message.
 
         try {
-            return this.io.sendRaw(redisMsg);
+            return io.sendRaw(redisMsg);
         } catch (IOException e) {
-            this.isClosed = true;
+            isClosed = true;
             throw new SQLException(e.getMessage());
         }
     }
 
     private void checkConnection() throws SQLException {
-        if(this.isClosed())
+        if(isClosed()) {
             throw new SQLException("Connection with Redis is closed");
+        }
     }
 
     @Override

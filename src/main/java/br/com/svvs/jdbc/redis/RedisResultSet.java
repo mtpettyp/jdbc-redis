@@ -31,8 +31,8 @@ public class RedisResultSet implements ResultSet {
     private int upperLimit;
     private boolean isClosed;
 
-    RedisResultSet(String[] result) {
-        this.result     = result;
+    public RedisResultSet(String[] result) {
+        this.result = result;
         this.upperLimit = result.length - 1;
     }
 

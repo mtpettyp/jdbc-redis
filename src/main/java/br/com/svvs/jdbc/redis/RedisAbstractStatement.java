@@ -1,68 +1,37 @@
 package br.com.svvs.jdbc.redis;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import br.com.svvs.jdbc.redis.RedisProtocol;
 
 public abstract class RedisAbstractStatement {
-	
-	
-	protected boolean isClosed = false;
-	protected RedisConnection conn;
-	protected RedisResultSet resultSet;
-	protected String sql;
-	
-	protected RedisAbstractStatement(String sql, RedisConnection conn) {
-		this.sql  = sql;
-		this.conn = conn;
-	}
-	protected RedisAbstractStatement(RedisConnection conn) {
-		this.conn = conn;
-	}
-	
-	protected RedisCommandWrapper extractCommand(final String sql) throws RedisParseException {
 
-		String[] sql_splt = sql.trim().split(" ",2);
+    protected boolean isClosed = false;
+    protected RedisConnection connection;
+    protected ResultSet resultSet;
+    protected String sql;
 
-		try {
-			RedisProtocol cmd = RedisProtocol.valueOf(RedisProtocol.class, sql_splt[0].toUpperCase());
-			return new RedisCommandWrapper(cmd, sql_splt.length == 2 ? sql_splt[1] : "");
-		} catch(IllegalArgumentException e) {
-			throw new RedisParseException("Command not recognized.");
-		}
-	}
+    protected RedisAbstractStatement(String sql, RedisConnection connection) {
+        this.sql  = sql;
+        this.connection = connection;
+    }
+    protected RedisAbstractStatement(RedisConnection connection) {
+        this.connection = connection;
+    }
 
-	public boolean execute(String sql) throws SQLException {
-		
-		if(this.isClosed)
-			throw new SQLException("This statement is closed.");
-		
-		try {
-			RedisCommandWrapper wrapper = this.extractCommand(sql);
-			
-			String redisMsg = wrapper.cmd.createMsg(wrapper.value);
-			
-			String[] result = wrapper.cmd.parseMsg(this.conn.msgToServer(redisMsg));
-			
-			if(result != null)
-				this.resultSet = new RedisResultSet(result);
-			
-			return true;
-						
-		} catch (RedisParseException e) {
-			throw new SQLException(e);
-		} catch (RedisResultException e) {
-			throw new SQLException(e);
-		}
-	}
+    public boolean execute(String sql) throws SQLException {
 
-	class RedisCommandWrapper {
-		RedisProtocol cmd;
-		String value;
+        if(isClosed)
+            throw new SQLException("This statement is closed.");
 
-		RedisCommandWrapper(RedisProtocol cmd, String value) {
-			this.cmd   = cmd;
-			this.value = value;
-		}
-	}
+        try {
+            resultSet = RedisCommandProcessor.runCommand(connection, sql);
+
+            return true;
+
+        } catch (RedisParseException |
+                 RedisResultException e) {
+            throw new SQLException(e);
+        }
+    }
 
 }
