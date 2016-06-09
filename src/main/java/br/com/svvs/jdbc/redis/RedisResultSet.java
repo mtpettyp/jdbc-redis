@@ -26,14 +26,12 @@ import java.util.Map;
 
 public class RedisResultSet implements ResultSet {
 
-    private String[] result;
-    private int position = -1;
-    private int upperLimit;
     private boolean isClosed;
+    protected int position = -1;
+    protected String[] result;
 
-    public RedisResultSet(String[] result) {
+    public RedisResultSet(final String[] result) {
         this.result = result;
-        this.upperLimit = result.length - 1;
     }
 
     @Override
@@ -499,27 +497,29 @@ public class RedisResultSet implements ResultSet {
 
     @Override
     public boolean isAfterLast() throws SQLException {
-        return this.position >= this.upperLimit;
+        return position >= result.length;
     }
 
     @Override
     public boolean isBeforeFirst() throws SQLException {
-        return this.position < 0;
+        //TODO: valid for SCAN
+        return position < 0;
     }
 
     @Override
     public boolean isClosed() throws SQLException {
-        return this.isClosed;
+        return isClosed;
     }
 
     @Override
     public boolean isFirst() throws SQLException {
-        return this.position == 0;
+        //TODO: valid for SCAN
+        return position == 0;
     }
 
     @Override
     public boolean isLast() throws SQLException {
-        return this.position == this.upperLimit - 1;
+        return position == result.length - 1;
     }
 
     @Override
@@ -539,8 +539,8 @@ public class RedisResultSet implements ResultSet {
 
     @Override
     public boolean next() throws SQLException {
-        if(this.position < this.upperLimit) {
-            this.position++;
+        if (position < result.length - 1) {
+            position++;
             return true;
         } else {
             return false;

@@ -2,6 +2,7 @@ package br.com.svvs.jdbc.redis.response;
 
 import java.sql.ResultSet;
 
+import br.com.svvs.jdbc.redis.RedisConnection;
 import br.com.svvs.jdbc.redis.RedisResultSet;
 
 public class RedisSimpleResponse implements RedisResponse {
@@ -12,7 +13,7 @@ public class RedisSimpleResponse implements RedisResponse {
     }
 
     @Override
-    public ResultSet processResponse(final String command, final Object response) {
+    public ResultSet processResponse(final RedisConnection connection, final String command, final Object response) {
         return new RedisResultSet(new String[]{(String)response});
     }
 }

@@ -2,6 +2,7 @@ package br.com.svvs.jdbc.redis;
 
 import br.com.svvs.jdbc.redis.response.RedisArrayResponse;
 import br.com.svvs.jdbc.redis.response.RedisResponse;
+import br.com.svvs.jdbc.redis.response.RedisScanResponse;
 import br.com.svvs.jdbc.redis.response.RedisShutdownResponse;
 import br.com.svvs.jdbc.redis.response.RedisSimpleResponse;
 
@@ -47,6 +48,7 @@ public enum RedisCommand {
     RPUSH(RedisSimpleResponse.INSTANCE),
     SADD(RedisSimpleResponse.INSTANCE),
     SAVE(RedisSimpleResponse.INSTANCE),
+    SCAN(RedisScanResponse.INSTANCE),
     SCARD(RedisSimpleResponse.INSTANCE),
     SELECT(RedisSimpleResponse.INSTANCE),
     SET(RedisSimpleResponse.INSTANCE),

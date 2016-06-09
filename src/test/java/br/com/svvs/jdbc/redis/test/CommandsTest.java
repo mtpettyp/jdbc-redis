@@ -9,7 +9,9 @@ import static org.junit.Assert.fail;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -370,7 +372,7 @@ public class CommandsTest {
         execute("RPUSH " + key + " second");
         execute("RPUSH " + key + " third");
 
-        String[] r = new String[]{"first","second","third"};
+        String[] r = new String[]{"first", "second", "third"};
 
         for(int i = 0; i < r.length; i++) {
             assertEquals(r[i], executeSingleStringResult("LPOP " + key));
@@ -386,7 +388,7 @@ public class CommandsTest {
         execute("RPUSH " + key + " second");
         execute("RPUSH " + key + " third");
 
-        String[] r = new String[]{"third","second","first"};
+        String[] r = new String[]{"third", "second", "first"};
 
         for (int i = 0; i < r.length; i++) {
             assertEquals(r[i], executeSingleStringResult("RPOP " + key));
@@ -460,6 +462,28 @@ public class CommandsTest {
         assertEquals("value1", retrieveValue(key));
         delete(key);
     }
+
+    @Test
+    public void scan() throws Exception {
+        String key = keyPrefix + "_SCAN";
+
+        for (int i = 0; i < 30; i++ ) {
+            createValue(key + i, "value" + i);
+        }
+
+        Set<String> results = new HashSet<>(executeStringResults("SCAN 0"));
+
+        assertEquals(30, results.size());
+
+        for (int i = 0; i < 30; i++ ) {
+            assertTrue(results.contains(key + i));
+        }
+
+        for (int i = 0; i < 30; i++ ) {
+            delete(key + i);
+        }
+    }
+
 
     private void execute(final String command) throws Exception {
         conn.createStatement().execute(command);

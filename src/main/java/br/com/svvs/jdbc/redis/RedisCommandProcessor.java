@@ -16,7 +16,7 @@ public final class RedisCommandProcessor {
         String response = connection.msgToServer(statement + "\r\n");
         Object respResponse = RESPDecoder.decode(response);
 
-        return command.getResponse().processResponse(statement, respResponse);
+        return command.getResponse().processResponse(connection, statement, respResponse);
     }
 
 
