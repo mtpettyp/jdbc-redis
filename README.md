@@ -70,10 +70,10 @@ The following is the list of currently supported statements:
 | AUTH | :white_check_mark: |
 | BGREWRITEAOF | :white_check_mark: |
 | BGSAVE | :white_check_mark: |
-| BITCOUNT | :x: |
-| BITFIELD | :x: |
-| BITOP | :x: |
-| BITPOS | :x: |
+| BITCOUNT | :white_check_mark: |
+| BITFIELD | :white_check_mark: |
+| BITOP | :white_check_mark: |
+| BITPOS | :white_check_mark: |
 | BLPOP | :x: |
 | BRPOP | :x: |
 | BRPOPLPUSH | :x: |
@@ -133,7 +133,7 @@ The following is the list of currently supported statements:
 | GEORADIUS | :x: |
 | GEORADIUSBYMEMBER | :x: |
 | GET | :white_check_mark: |
-| GETBIT | :x: |
+| GETBIT | :white_check_mark: |
 | GETRANGE | :x: |
 | GETSET | :white_check_mark: |
 | HDEL | :x: |
@@ -213,7 +213,7 @@ The following is the list of currently supported statements:
 | SDIFFSTORE | :x: |
 | SELECT | :white_check_mark: |
 | SET | :white_check_mark: |
-| SETBIT | :x: |
+| SETBIT | :white_check_mark: |
 | SETEX | :x: |
 | SETNX | :white_check_mark: |
 | SETRANGE | :x: |

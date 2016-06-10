@@ -490,6 +490,72 @@ public class CommandsTest {
                 executeSingleStringResult("BGREWRITEAOF"));
     }
 
+    @Test
+    public void setbit() throws Exception {
+        String key = keyPrefix + "_SETBIT";
+
+        assertEquals(0, executeSingleIntegerResult("SETBIT " + key + " 1 1"));
+
+        delete(key);
+    }
+
+    @Test
+    public void getbit() throws Exception {
+        String key = keyPrefix + "_GETBIT";
+
+        assertEquals(0, executeSingleIntegerResult("SETBIT " + key + " 7 1"));
+        assertEquals(1, executeSingleIntegerResult("GETBIT " + key + " 7"));
+
+        delete(key);
+    }
+
+    @Test
+    public void bitcount() throws Exception {
+        String key = keyPrefix + "_BITCOUNT";
+
+        createValue(key, "foobar");
+        assertEquals(26, executeSingleIntegerResult("BITCOUNT " + key));
+
+        delete(key);
+    }
+
+    @Test
+    public void bitpos() throws Exception {
+        String key = keyPrefix + "_BITPOS";
+
+        createValue(key, "\"\\xff\\xf0\\x00\"");
+        assertEquals(12, executeSingleIntegerResult("BITPOS " + key + " 0"));
+
+        delete(key);
+    }
+
+    @Test
+    public void bitop() throws Exception {
+        String key = keyPrefix + "_BITOP";
+
+        createValue(key + 1, "foobar");
+        createValue(key + 2, "abcdef");
+        assertEquals(6, executeSingleIntegerResult("BITOP AND " + (key + 3) + " "  +
+        (key + 1) + " " + (key + 2)));
+        assertEquals("`bc`ab", retrieveValue(key + 3));
+        delete(key + 1);
+        delete(key + 2);
+        delete(key + 3);
+    }
+
+    @Test
+    public void bitfield() throws Exception {
+        String key = keyPrefix + "_BITFIELD";
+
+        List<Integer> results = executeIntegerResults("BITFIELD " + key + " INCRBY i5 100 1 GET u4 0");
+
+        assertEquals(2, results.size());
+        assertEquals(1, (int)results.get(0));
+        assertEquals(0, (int)results.get(1));
+
+        delete(key);
+    }
+
     private void execute(final String command) throws Exception {
         conn.createStatement().execute(command);
     }
