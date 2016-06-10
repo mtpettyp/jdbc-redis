@@ -10,6 +10,7 @@ public enum RedisCommand {
 
     APPEND(RedisSimpleResponse.INSTANCE),
     AUTH(RedisSimpleResponse.INSTANCE),
+    BGREWRITEAOF(RedisSimpleResponse.INSTANCE),
     BGSAVE(RedisSimpleResponse.INSTANCE),
     DBSIZE(RedisSimpleResponse.INSTANCE),
     DECR(RedisSimpleResponse.INSTANCE),

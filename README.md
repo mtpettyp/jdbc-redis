@@ -1,18 +1,18 @@
 [![Build Status](https://travis-ci.org/mtpettyp/jdbc-redis.svg?branch=master)](https://travis-ci.org/mtpettyp/jdbc-redis)
 [![Coverage Status](https://coveralls.io/repos/github/mtpettyp/jdbc-redis/badge.svg?branch=master)](https://coveralls.io/github/mtpettyp/jdbc-redis?branch=master)
 
-jdbc-redis is an effort to implement the JDBC API for Redis. 
+jdbc-redis is an effort to implement the JDBC API for Redis.
 
-## Note 
+## Note
 
-Redis isn't a relational database, so jdbc-redis doesn't implement all JDBC API functionality. If a function is not available a SQLFeatureNotSupportedException will be thrown. 
+Redis isn't a relational database, so jdbc-redis doesn't implement all JDBC API functionality. If a function is not available a SQLFeatureNotSupportedException will be thrown.
 
 ## Examples
 
 ### Getting a connection:
 
 ```java
-Class.forName("br.com.svvs.jdbc.redis.RedisDriver");  
+Class.forName("br.com.svvs.jdbc.redis.RedisDriver");
 Connection conn = DriverManager.getConnection("jdbc:redis://localhost");
 ```
 The format of the JDBC URL is as follows:
@@ -27,12 +27,12 @@ jdbc:redis://<host>:<port>/<db_number>
 ```java
 Statement statement = conn.createStatement();
 
-statement.execute("set my_first_key my first value");
-statement.execute("get my_first_key");
+statement.execute("SET my_first_key my_first_value");
+statement.execute("GET my_first_key");
 
 ResultSet r = statement.getResultSet();
 while(r.next()) {
-	System.out.println(">" + r.getString(0) +  "<");
+    System.out.println(">" + r.getString(0) +  "<");
 }
 
 conn.commit();
@@ -51,7 +51,7 @@ statement.execute();
 ResultSet r = statement.executeQuery("get my_key");
 
 while(r.next()) {
-	System.out.println(">" + r.getString(0) +  "<");
+    System.out.println(">" + r.getString(0) +  "<");
 }
 
 r.close();
@@ -68,7 +68,7 @@ The following is the list of currently supported statements:
 | ------- | :-----------: |
 | APPEND | :white_check_mark: |
 | AUTH | :white_check_mark: |
-| BGREWRITEAOF | :x: |
+| BGREWRITEAOF | :white_check_mark: |
 | BGSAVE | :white_check_mark: |
 | BITCOUNT | :x: |
 | BITFIELD | :x: |
@@ -202,7 +202,7 @@ The following is the list of currently supported statements:
 | RPUSHX | :x: |
 | SADD | :white_check_mark: |
 | SAVE | :white_check_mark: |
-| SCAN | :x: |
+| SCAN | :white_check_mark: |
 | SCARD | :white_check_mark: |
 | SCRIPT DEBUG | :x: |
 | SCRIPT EXISTS | :x: |
@@ -285,7 +285,7 @@ mvn test -Pdocker
 ```
 
 
-## COPYRIGHT/LICENSE 
+## COPYRIGHT/LICENSE
 
 Copyright (c) 2009, Marco Valtas All rights reserved.
 
@@ -298,7 +298,7 @@ form must reproduce the above copyright notice, this list of conditions and
 the following disclaimer in the documentation and/or other materials
 provided with the distribution. Neither the name of the JDBC-Redis nor
 the names of its contributors may be used to endorse or promote products
-derived from this software without specific prior written permission. 
+derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE

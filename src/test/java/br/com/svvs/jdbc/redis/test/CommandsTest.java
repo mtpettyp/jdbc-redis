@@ -484,6 +484,11 @@ public class CommandsTest {
         }
     }
 
+    @Test
+    public void bgrewriteaof() throws Exception {
+        assertEquals("Background append only file rewriting started",
+                executeSingleStringResult("BGREWRITEAOF"));
+    }
 
     private void execute(final String command) throws Exception {
         conn.createStatement().execute(command);
