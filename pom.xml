@@ -43,7 +43,7 @@
                             <images>
                                 <image>
                                     <alias>mc</alias>
-                                    <name>redis:3.0</name>
+                                    <name>redis:3.2</name>
                                     <run>
                                         <ports>
                                             <port>6379:6379</port>

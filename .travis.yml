@@ -12,8 +12,13 @@ jdk:
 
 script: mvn clean verify
 
-services:
-  - redis-server
+#services:
+#  - redis-server
+addons:
+  apt:
+    packages:
+      - redis-server
+
 
 after_success:
   - mvn jacoco:report coveralls:report
