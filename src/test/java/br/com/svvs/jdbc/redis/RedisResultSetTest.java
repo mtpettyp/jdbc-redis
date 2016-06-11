@@ -1,10 +1,9 @@
-package br.com.svvs.jdbc.redis.test;
+package br.com.svvs.jdbc.redis;
 
 import static java.sql.ResultSet.TYPE_SCROLL_INSENSITIVE;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -12,14 +11,10 @@ import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.NClob;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLFeatureNotSupportedException;
 
 import org.junit.Test;
 
-import br.com.svvs.jdbc.redis.RedisResultSet;
-
-public class RedisResultSetTest {
+public class RedisResultSetTest extends BaseTest {
 
     @Test
     public void integerMethods() throws Exception {
@@ -36,6 +31,7 @@ public class RedisResultSetTest {
         rs.next();
         assertEquals(0, rs.getInt(0));
         assertEquals(0, rs.getInt(""));
+        rs.close();
     }
 
     @Test
@@ -53,6 +49,7 @@ public class RedisResultSetTest {
         rs.next();
         assertEquals(0, rs.getLong(0));
         assertEquals(0, rs.getLong(""));
+        rs.close();
     }
 
     @Test
@@ -70,6 +67,7 @@ public class RedisResultSetTest {
         rs.next();
         assertEquals(0, rs.getShort(0));
         assertEquals(0, rs.getShort(""));
+        rs.close();
     }
 
     @Test
@@ -87,6 +85,8 @@ public class RedisResultSetTest {
         rs.next();
         assertEquals(0.0, rs.getDouble(0), 0.001);
         assertEquals(0.0, rs.getDouble(""), 0.001);
+
+        rs.close();
     }
 
     @Test
@@ -104,6 +104,8 @@ public class RedisResultSetTest {
         rs.next();
         assertEquals(0.0, rs.getFloat(0), 0.001);
         assertEquals(0.0, rs.getFloat(""), 0.001);
+
+        rs.close();
     }
 
     @Test
@@ -147,6 +149,7 @@ public class RedisResultSetTest {
         assertFalse(rs.isAfterLast());
         assertSQLException(() -> rs.getString(0));
 
+        rs.close();
     }
 
 
@@ -262,32 +265,4 @@ public class RedisResultSetTest {
 
         rs.close();
     }
-
-
-
-
-
-    public SQLFeatureNotSupportedException assertNotSupported(final ExceptionThrowing block) {
-        return assertThrows(SQLFeatureNotSupportedException.class, block);
-    }
-
-    public SQLException assertSQLException(final ExceptionThrowing block) {
-        return assertThrows(SQLException.class, block);
-    }
-
-    public static <X extends Throwable> X assertThrows(final Class<X> exceptionClass, final ExceptionThrowing block) {
-        try {
-            block.run();
-        } catch (Throwable ex) {
-            if (exceptionClass.isInstance(ex))
-                return exceptionClass.cast(ex);
-        }
-        fail("Failed to throw expected exception");
-        return null;
-    }
-
-    interface ExceptionThrowing {
-        void run() throws Exception;
-    }
-
 }

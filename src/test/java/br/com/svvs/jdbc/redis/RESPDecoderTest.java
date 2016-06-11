@@ -1,13 +1,10 @@
-package br.com.svvs.jdbc.redis.test;
+package br.com.svvs.jdbc.redis;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
-
-import br.com.svvs.jdbc.redis.RESPDecoder;
-import br.com.svvs.jdbc.redis.RedisResultException;
 
 public class RESPDecoderTest {
 

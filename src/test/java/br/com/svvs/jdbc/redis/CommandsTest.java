@@ -1,4 +1,4 @@
-package br.com.svvs.jdbc.redis.test;
+package br.com.svvs.jdbc.redis;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
