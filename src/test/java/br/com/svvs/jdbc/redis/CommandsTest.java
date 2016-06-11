@@ -8,6 +8,7 @@ import static org.junit.Assert.fail;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -32,6 +33,11 @@ public class CommandsTest {
         TestHelper t = TestHelper.getInstance();
         conn = t.getConnection();
         keyPrefix = t.get("keyPrefix");
+    }
+
+    @Test(expected = SQLException.class)
+    public void invalidCommand() throws Exception {
+        executeSingleStringResult("INVALID");
     }
 
     @Test
