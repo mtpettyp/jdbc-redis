@@ -13,11 +13,6 @@ public final class TestHelper {
     private ResourceBundle bundle;
 
     private TestHelper() {
-        try {
-            Class.forName("br.com.svvs.jdbc.redis.RedisDriver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Can't load driver class: " + e.getMessage());
-        }
         bundle = ResourceBundle.getBundle(propFile);
     }
 

@@ -13,59 +13,59 @@ import java.util.logging.Logger;
 
 public class RedisDriver implements Driver {
 
-    // those are public so user can peek, but all are final.
-    public static final String JDBC_URL = "jdbc:redis:";
+    private static final String JDBC_URL = "jdbc:redis:";
 
-    public static final String DEFAULT_HOST = "localhost";
-    public static final int    DEFAULT_PORT = 6379;
-    public static final int    DEFAULT_DBNB = 0;
+    private static final String DEFAULT_HOST = "localhost";
+    private static final int DEFAULT_PORT = 6379;
+    private static final int DEFAULT_DBNB = 0;
 
-    public static final int MAJOR_VERSION = 0;
-    public static final int MINOR_VERSION = 1;
+    private static final int MAJOR_VERSION = 0;
+    private static final int MINOR_VERSION = 1;
 
     static {
         try {
             DriverManager.registerDriver(new RedisDriver());
         } catch (SQLException e) {
-            throw new RuntimeException("Can't register redis JDBC driver!");
+            throw new RuntimeException("Can't register Redis JDBC driver", e);
         }
     }
 
     @Override
-    public boolean acceptsURL(String url) throws SQLException {
+    public boolean acceptsURL(final String url) throws SQLException {
         return url.toLowerCase().startsWith(JDBC_URL);
     }
 
     @Override
-    public Connection connect(String url, Properties info) throws SQLException {
+    public Connection connect(final String url, final Properties info) throws SQLException {
+
         if(!this.acceptsURL(url)) {
             throw new SQLException("Invalid URL: " + url);
         } else {
             // remove prefix so we can use URI parsing.
-            String raw_url = url.replaceFirst("jdbc:","");
+            String rawUrl = url.replaceFirst("jdbc:","");
+            String host = DEFAULT_HOST;
+            int port = DEFAULT_PORT;
+            int dbnb = DEFAULT_DBNB;
             try {
 
-                URI uri = new URI(raw_url);
+                URI uri = new URI(rawUrl);
 
-                String host = uri.getHost();
-                int    port = uri.getPort();
-                String path = uri.getPath();
+                host = uri.getHost() != null ? uri.getHost() : DEFAULT_HOST;
+                port = uri.getPort() != -1 ? uri.getPort() : DEFAULT_PORT;
 
-                // solve defaults...
-                if(host != null && port != -1 && path != null) {
-                    int dbnb = Integer.parseInt(path.substring(1));// FIXME: better handle path parsing.
-                    return RedisConnectionFactory.getConnection(host, port, dbnb, info);
-                } else if (host != null && port != -1) {
-                    return RedisConnectionFactory.getConnection(host, port, DEFAULT_DBNB, info);
-                } else if (host != null) {
-                    return RedisConnectionFactory.getConnection(host, DEFAULT_PORT, DEFAULT_DBNB, info);
-                } else {
-                    return RedisConnectionFactory.getConnection(DEFAULT_HOST, DEFAULT_PORT, DEFAULT_DBNB, info);
+                dbnb = DEFAULT_PORT;
+
+                if (uri.getPath() != null && uri.getPath().length() > 1) {
+                    dbnb = Integer.parseInt(uri.getPath().substring(1));
                 }
 
-            } catch (URISyntaxException e) {
-                throw new SQLException("Could not parse JDBC URL: " + url);
+            } catch (URISyntaxException |
+                     NumberFormatException e) {
+                throw new SQLException("Could not parse JDBC URL: " + url, e);
             }
+
+            return RedisConnectionFactory.getConnection(host, port, dbnb, info);
+
         }
     }
 
@@ -80,21 +80,18 @@ public class RedisDriver implements Driver {
     }
 
     @Override
-    public DriverPropertyInfo[] getPropertyInfo(String url, Properties info)
+    public DriverPropertyInfo[] getPropertyInfo(final String url, final Properties info)
             throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        return new DriverPropertyInfo[0];
     }
 
     @Override
     public boolean jdbcCompliant() {
-        // still not compliant
         return false;
     }
 
     @Override
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-        return null;
+        throw new SQLFeatureNotSupportedException("getParentLogger");
     }
-
 }

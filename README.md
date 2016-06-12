@@ -12,8 +12,7 @@ Redis isn't a relational database, so jdbc-redis doesn't implement all JDBC API 
 ### Getting a connection:
 
 ```java
-Class.forName("br.com.svvs.jdbc.redis.RedisDriver");
-Connection conn = DriverManager.getConnection("jdbc:redis://localhost");
+Connection connection = DriverManager.getConnection("jdbc:redis://localhost");
 ```
 The format of the JDBC URL is as follows:
 
@@ -48,7 +47,7 @@ statement.setString(1, "my_key");
 statement.setInt(2, 1771);
 statement.execute();
 
-ResultSet r = statement.executeQuery("get my_key");
+ResultSet r = statement.executeQuery("GET my_key");
 
 while(r.next()) {
     System.out.println(">" + r.getString(0) +  "<");
