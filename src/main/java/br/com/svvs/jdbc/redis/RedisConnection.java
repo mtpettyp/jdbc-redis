@@ -27,6 +27,7 @@ public class RedisConnection implements java.sql.Connection {
 
     private RedisIO io = null;
     private boolean isClosed = true;
+    private boolean autoCommit = true;
 
     public RedisConnection(final RedisIO io, final Properties info) throws SQLException {
 
@@ -135,7 +136,7 @@ public class RedisConnection implements java.sql.Connection {
 
     @Override
     public boolean getAutoCommit() throws SQLException {
-        throw new SQLFeatureNotSupportedException("createStruct");
+        return autoCommit;
     }
 
     @Override
@@ -270,7 +271,7 @@ public class RedisConnection implements java.sql.Connection {
 
     @Override
     public void setAutoCommit(final boolean autoCommit) throws SQLException {
-        throw new SQLFeatureNotSupportedException("setAutoCommit");
+        this.autoCommit = autoCommit;
     }
 
     @Override

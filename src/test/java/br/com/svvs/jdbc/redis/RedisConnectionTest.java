@@ -1,5 +1,8 @@
 package br.com.svvs.jdbc.redis;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.sql.Connection;
 
 import org.junit.After;
@@ -19,6 +22,14 @@ public class RedisConnectionTest extends BaseTest {
     @After
     public void quit() throws Exception {
         connection.close();
+    }
+
+    @Test
+    public void autoCommit() throws Exception {
+        connection.setAutoCommit(false);
+        assertFalse(connection.getAutoCommit());
+        connection.setAutoCommit(true);
+        assertTrue(connection.getAutoCommit());
     }
 
     @Test
@@ -47,8 +58,6 @@ public class RedisConnectionTest extends BaseTest {
         assertNotSupported(() -> connection.releaseSavepoint(null));
         assertNotSupported(() -> connection.rollback());
         assertNotSupported(() -> connection.rollback(null));
-        assertNotSupported(() -> connection.getAutoCommit());
-        assertNotSupported(() -> connection.setAutoCommit(false));
         assertNotSupported(() -> connection.setCatalog(null));
         assertNotSupported(() -> connection.setHoldability(0));
         assertNotSupported(() -> connection.setReadOnly(false));
