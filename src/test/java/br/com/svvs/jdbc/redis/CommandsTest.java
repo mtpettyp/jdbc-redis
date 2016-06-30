@@ -562,6 +562,197 @@ public class CommandsTest {
         delete(key);
     }
 
+    @Test
+    public void hdel() throws Exception {
+        String key = keyPrefix + "_HDEL";
+
+        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field1 \"foo\""));
+        assertEquals(1, executeSingleIntegerResult("HDEL " + key + " field1 \"foo\""));
+        assertEquals(0, executeSingleIntegerResult("HDEL " + key + " field1 \"foo\""));
+
+        delete(key);
+    }
+
+    @Test
+    public void hexists() throws Exception {
+        String key = keyPrefix + "_HEXISTS";
+
+        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field1 \"foo\""));
+        assertEquals(1, executeSingleIntegerResult("HEXISTS " + key + " field1"));
+        assertEquals(0, executeSingleIntegerResult("HEXISTS " + key + " field2"));
+
+        delete(key);
+    }
+
+    @Test
+    public void hget() throws Exception {
+        String key = keyPrefix + "_HGET";
+
+        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field1 \"foo\""));
+        assertEquals("foo", executeSingleStringResult("HGET " + key + " field1"));
+        assertNull(executeSingleStringResult("HGET " + key + " field2"));
+
+        delete(key);
+    }
+
+    @Test
+    public void hgetall() throws Exception {
+        String key = keyPrefix + "_HGETALL";
+
+        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field1 \"Hello\""));
+        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field2 \"World\""));
+
+        //TODO: should return two rows with two columns
+        List<String> results = executeStringResults("HGETALL " + key);
+
+        assertEquals(4, results.size());
+        assertEquals("field1", results.get(0));
+        assertEquals("Hello", results.get(1));
+        assertEquals("field2", results.get(2));
+        assertEquals("World", results.get(3));
+
+        delete(key);
+    }
+
+    @Test
+    public void hincrby() throws Exception {
+        String key = keyPrefix + "_HINCRBY";
+
+        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field1 5"));
+        assertEquals(6, executeSingleIntegerResult("HINCRBY " + key + " field1 1"));
+
+        delete(key);
+    }
+
+    @Test
+    public void hincrbyfloat() throws Exception {
+        String key = keyPrefix + "_HINCRBYFLOAT";
+
+        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field1 10.50"));
+        assertEquals("10.6", executeSingleStringResult("HINCRBYFLOAT " + key + " field1 0.1"));
+
+        delete(key);
+    }
+
+    @Test
+    public void hkeys() throws Exception {
+        String key = keyPrefix + "_HKEYS";
+
+        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field1 \"Hello\""));
+        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field2 \"World\""));
+
+        List<String> results = executeStringResults("HKEYS " + key);
+
+        assertEquals(2, results.size());
+        assertEquals("field1", results.get(0));
+        assertEquals("field2", results.get(1));
+
+        delete(key);
+    }
+
+    @Test
+    public void hlen() throws Exception {
+        String key = keyPrefix + "_HLEN";
+
+        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field1 \"Hello\""));
+        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field2 \"World\""));
+        assertEquals(2, executeSingleIntegerResult("HLEN " + key));
+
+        delete(key);
+    }
+
+    @Test
+    public void hmget() throws Exception {
+        String key = keyPrefix + "_HMGET";
+
+        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field1 \"Hello\""));
+        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field2 \"World\""));
+        List<String> results = executeStringResults("HMGET " + key + " field1 field2 nofield");
+
+        assertEquals(3, results.size());
+        assertEquals("Hello", results.get(0));
+        assertEquals("World", results.get(1));
+        assertNull(results.get(2));
+
+        delete(key);
+    }
+
+    @Test
+    public void hmset() throws Exception {
+        String key = keyPrefix + "_HMSET";
+
+        assertEquals("OK", executeSingleStringResult("HMSET " + key + " field1 \"Hello\" field2 \"World\""));
+        assertEquals("Hello", executeSingleStringResult("HGET " + key + " field1"));
+        assertEquals("World", executeSingleStringResult("HGET " + key + " field2"));
+
+        delete(key);
+    }
+
+    @Test
+    public void hscan() throws Exception {
+        String key = keyPrefix + "_HSCAN";
+
+        assertEquals("OK", executeSingleStringResult("HMSET " + key + " field1 \"Hello\" field2 \"World\""));
+
+        List<String> results = executeStringResults("HSCAN " + key + " 0");
+
+        //TODO: return values as multiple columns
+
+        assertEquals(4, results.size());
+        assertEquals("field1", results.get(0));
+        assertEquals("Hello", results.get(1));
+        assertEquals("field2", results.get(2));
+        assertEquals("World", results.get(3));
+
+        delete(key);
+    }
+
+    @Test
+    public void hset() throws Exception {
+        String key = keyPrefix + "_HSET";
+
+        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field1 \"foo\""));
+
+        delete(key);
+    }
+
+    @Test
+    public void hsetnx() throws Exception {
+        String key = keyPrefix + "_HSETNX";
+
+        assertEquals(1, executeSingleIntegerResult("HSETNX " + key + " field \"Hello\""));
+        assertEquals(0, executeSingleIntegerResult("HSETNX " + key + " field \"World\""));
+        assertEquals("Hello", executeSingleStringResult("HGET " + key + " field"));
+
+        delete(key);
+    }
+
+    @Test
+    public void hstrlen() throws Exception {
+        String key = keyPrefix + "_HSTRLN";
+
+        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field \"Hello\""));
+        assertEquals(5, executeSingleIntegerResult("HSTRLEN " + key + " field"));
+
+        delete(key);
+    }
+
+    @Test
+    public void hvals() throws Exception {
+        String key = keyPrefix + "_HVALS";
+
+        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field1 \"Hello\""));
+        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field2 \"World\""));
+
+        List<String> results = executeStringResults("HVALS " + key);
+
+        assertEquals(2, results.size());
+        assertEquals("Hello", results.get(0));
+        assertEquals("World", results.get(1));
+
+        delete(key);
+    }
+
     private void execute(final String command) throws Exception {
         conn.createStatement().execute(command);
     }
