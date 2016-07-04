@@ -566,7 +566,7 @@ public class CommandsTest {
     public void hdel() throws Exception {
         String key = keyPrefix + "_HDEL";
 
-        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field1 \"foo\""));
+        executeSingleIntegerResult("HSET " + key + " field1 \"foo\"");
         assertEquals(1, executeSingleIntegerResult("HDEL " + key + " field1 \"foo\""));
         assertEquals(0, executeSingleIntegerResult("HDEL " + key + " field1 \"foo\""));
 
@@ -577,7 +577,7 @@ public class CommandsTest {
     public void hexists() throws Exception {
         String key = keyPrefix + "_HEXISTS";
 
-        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field1 \"foo\""));
+        executeSingleIntegerResult("HSET " + key + " field1 \"foo\"");
         assertEquals(1, executeSingleIntegerResult("HEXISTS " + key + " field1"));
         assertEquals(0, executeSingleIntegerResult("HEXISTS " + key + " field2"));
 
@@ -588,7 +588,7 @@ public class CommandsTest {
     public void hget() throws Exception {
         String key = keyPrefix + "_HGET";
 
-        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field1 \"foo\""));
+        executeSingleIntegerResult("HSET " + key + " field1 \"foo\"");
         assertEquals("foo", executeSingleStringResult("HGET " + key + " field1"));
         assertNull(executeSingleStringResult("HGET " + key + " field2"));
 
@@ -599,8 +599,8 @@ public class CommandsTest {
     public void hgetall() throws Exception {
         String key = keyPrefix + "_HGETALL";
 
-        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field1 \"Hello\""));
-        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field2 \"World\""));
+        executeSingleIntegerResult("HSET " + key + " field1 \"Hello\"");
+        executeSingleIntegerResult("HSET " + key + " field2 \"World\"");
 
         //TODO: should return two rows with two columns
         List<String> results = executeStringResults("HGETALL " + key);
@@ -618,7 +618,7 @@ public class CommandsTest {
     public void hincrby() throws Exception {
         String key = keyPrefix + "_HINCRBY";
 
-        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field1 5"));
+        executeSingleIntegerResult("HSET " + key + " field1 5");
         assertEquals(6, executeSingleIntegerResult("HINCRBY " + key + " field1 1"));
 
         delete(key);
@@ -628,7 +628,7 @@ public class CommandsTest {
     public void hincrbyfloat() throws Exception {
         String key = keyPrefix + "_HINCRBYFLOAT";
 
-        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field1 10.50"));
+        executeSingleIntegerResult("HSET " + key + " field1 10.50");
         assertEquals("10.6", executeSingleStringResult("HINCRBYFLOAT " + key + " field1 0.1"));
 
         delete(key);
@@ -638,8 +638,8 @@ public class CommandsTest {
     public void hkeys() throws Exception {
         String key = keyPrefix + "_HKEYS";
 
-        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field1 \"Hello\""));
-        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field2 \"World\""));
+        executeSingleIntegerResult("HSET " + key + " field1 \"Hello\"");
+        executeSingleIntegerResult("HSET " + key + " field2 \"World\"");
 
         List<String> results = executeStringResults("HKEYS " + key);
 
@@ -654,8 +654,8 @@ public class CommandsTest {
     public void hlen() throws Exception {
         String key = keyPrefix + "_HLEN";
 
-        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field1 \"Hello\""));
-        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field2 \"World\""));
+        executeSingleIntegerResult("HSET " + key + " field1 \"Hello\"");
+        executeSingleIntegerResult("HSET " + key + " field2 \"World\"");
         assertEquals(2, executeSingleIntegerResult("HLEN " + key));
 
         delete(key);
@@ -665,8 +665,8 @@ public class CommandsTest {
     public void hmget() throws Exception {
         String key = keyPrefix + "_HMGET";
 
-        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field1 \"Hello\""));
-        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field2 \"World\""));
+        executeSingleIntegerResult("HSET " + key + " field1 \"Hello\"");
+        executeSingleIntegerResult("HSET " + key + " field2 \"World\"");
         List<String> results = executeStringResults("HMGET " + key + " field1 field2 nofield");
 
         assertEquals(3, results.size());
@@ -681,7 +681,7 @@ public class CommandsTest {
     public void hmset() throws Exception {
         String key = keyPrefix + "_HMSET";
 
-        assertEquals("OK", executeSingleStringResult("HMSET " + key + " field1 \"Hello\" field2 \"World\""));
+        executeSingleStringResult("HMSET " + key + " field1 \"Hello\" field2 \"World\"");
         assertEquals("Hello", executeSingleStringResult("HGET " + key + " field1"));
         assertEquals("World", executeSingleStringResult("HGET " + key + " field2"));
 
@@ -692,7 +692,7 @@ public class CommandsTest {
     public void hscan() throws Exception {
         String key = keyPrefix + "_HSCAN";
 
-        assertEquals("OK", executeSingleStringResult("HMSET " + key + " field1 \"Hello\" field2 \"World\""));
+        executeSingleStringResult("HMSET " + key + " field1 \"Hello\" field2 \"World\"");
 
         List<String> results = executeStringResults("HSCAN " + key + " 0");
 
@@ -731,7 +731,7 @@ public class CommandsTest {
     public void hstrlen() throws Exception {
         String key = keyPrefix + "_HSTRLN";
 
-        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field \"Hello\""));
+        executeSingleIntegerResult("HSET " + key + " field \"Hello\"");
         assertEquals(5, executeSingleIntegerResult("HSTRLEN " + key + " field"));
 
         delete(key);
@@ -741,8 +741,8 @@ public class CommandsTest {
     public void hvals() throws Exception {
         String key = keyPrefix + "_HVALS";
 
-        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field1 \"Hello\""));
-        assertEquals(1, executeSingleIntegerResult("HSET " + key + " field2 \"World\""));
+        executeSingleIntegerResult("HSET " + key + " field1 \"Hello\"");
+        executeSingleIntegerResult("HSET " + key + " field2 \"World\"");
 
         List<String> results = executeStringResults("HVALS " + key);
 
@@ -751,6 +751,256 @@ public class CommandsTest {
         assertEquals("World", results.get(1));
 
         delete(key);
+    }
+
+    @Test
+    public void zadd() throws Exception {
+        String key = keyPrefix + "_ZADD";
+
+        assertEquals(1, executeSingleIntegerResult("ZADD " + key + " 1 \"one\""));
+
+        delete(key);
+    }
+
+    @Test
+    public void zcard() throws Exception {
+        String key = keyPrefix + "_ZCARD";
+
+        executeSingleIntegerResult("ZADD " + key + " 1 \"one\"");
+        executeSingleIntegerResult("ZADD " + key + " 2 \"two\"");
+        assertEquals(2, executeSingleIntegerResult("ZCARD " + key));
+
+        delete(key);
+    }
+
+    @Test
+    public void zcount() throws Exception {
+        String key = keyPrefix + "_ZCOUNT";
+
+        executeSingleIntegerResult("ZADD " + key + " 1 \"one\"");
+        executeSingleIntegerResult("ZADD " + key + " 2 \"two\"");
+        executeSingleIntegerResult("ZADD " + key + " 3 \"three\"");
+        assertEquals(2, executeSingleIntegerResult("ZCOUNT " + key + " (1 3"));
+
+        delete(key);
+    }
+
+    @Test
+    public void zincrby() throws Exception {
+        String key = keyPrefix + "_ZINCRBY";
+
+        assertEquals(1, executeSingleIntegerResult("ZADD " + key + " 1 \"one\""));
+        assertEquals(3, executeSingleIntegerResult("ZINCRBY " + key + " 2 \"one\""));
+
+        delete(key);
+    }
+
+    @Test
+    public void zinterstore() throws Exception {
+        String key = keyPrefix + "_ZINTERSTORE";
+
+        executeSingleIntegerResult("ZADD " + key + "1 1 \"one\"");
+        executeSingleIntegerResult("ZADD " + key + "2 2 \"one\"");
+        assertEquals(1, executeSingleIntegerResult("ZINTERSTORE " + key + "OUT" + " 2 " + key + "1 " + key + "2"));
+
+        delete(key + 1);
+        delete(key + 2);
+        delete(key + "OUT");
+    }
+
+    @Test
+    public void zlexcount() throws Exception {
+        String key = keyPrefix + "_ZLEXCOUNT";
+
+        executeSingleIntegerResult("ZADD " + key + " 0 a 0 b 0 c 0 d 0 e");
+        assertEquals(5, executeSingleIntegerResult("ZLEXCOUNT " + key + " - +"));
+
+        delete(key);
+    }
+
+    @Test
+    public void zrange() throws Exception {
+        String key = keyPrefix + "_ZRANGE";
+
+
+        //TODO: handle WITHSCORES
+        executeSingleIntegerResult("ZADD " + key + " 1 \"one\" 2 \"two\" 3 \"three\"");
+        assertEquals("three", executeSingleStringResult("ZRANGE " + key + " 2 3"));
+
+        delete(key);
+    }
+
+    @Test
+    public void zrangebylex() throws Exception {
+        String key = keyPrefix + "_ZRANGEBYLEX";
+
+        executeSingleIntegerResult("ZADD " + key + " 1 \"a\" 2 \"b\" 3 \"c\"");
+        List<String> results = executeStringResults("ZRANGEBYLEX " + key + " - [b");
+
+        assertEquals(2, results.size());
+        assertEquals("a", results.get(0));
+        assertEquals("b", results.get(1));
+
+        delete(key);
+    }
+
+    @Test
+    public void zrangebyscore() throws Exception {
+        String key = keyPrefix + "_ZRANGEBYSCORE";
+
+        executeSingleIntegerResult("ZADD " + key + " 1 \"one\" 2 \"two\" 3 \"three\"");
+        List<String> results = executeStringResults("ZRANGEBYSCORE " + key + " 1 2");
+        assertEquals(2, results.size());
+        assertEquals("one", results.get(0));
+        assertEquals("two", results.get(1));
+
+
+        delete(key);
+    }
+
+    @Test
+    public void zrank() throws Exception {
+        String key = keyPrefix + "_ZRANK";
+
+        executeSingleIntegerResult("ZADD " + key + " 1 \"a\" 1 \"b\" 2 \"c\"");
+        assertEquals(2, executeSingleIntegerResult("ZRANK " + key + " c"));
+
+        delete(key);
+    }
+
+    @Test
+    public void zrem() throws Exception {
+        String key = keyPrefix + "_ZREM";
+
+        executeSingleIntegerResult("ZADD " + key + " 1 \"one\" 2 \"two\" 3 \"three\"");
+        assertEquals(1, executeSingleIntegerResult("ZREM " + key + " two"));
+
+        delete(key);
+    }
+
+    @Test
+    public void zremrangebylex() throws Exception {
+        String key = keyPrefix + "_ZREMRANGEBYLEX";
+
+        executeSingleIntegerResult("ZADD " + key + " 0 a 0 b 0 c 0 d 0 e");
+        assertEquals(2, executeSingleIntegerResult("ZREMRANGEBYLEX " + key + " (a [c"));
+
+        delete(key);
+    }
+
+    @Test
+    public void zremrangebyrank() throws Exception {
+        String key = keyPrefix + "_ZREMRANGEBYRANK";
+
+        executeSingleIntegerResult("ZADD " + key + " 1 \"one\" 2 \"two\" 3 \"three\"");
+        assertEquals(2, executeSingleIntegerResult("ZREMRANGEBYRANK " + key + " 1 2"));
+
+        delete(key);
+    }
+
+    @Test
+    public void zremrangebyscore() throws Exception {
+        String key = keyPrefix + "_ZREMRANGEBYSCORE";
+
+        executeSingleIntegerResult("ZADD " + key + " 1 \"one\" 2 \"two\" 3 \"three\"");
+        assertEquals(1, executeSingleIntegerResult("ZREMRANGEBYSCORE " + key + " -inf (2"));
+
+        delete(key);
+    }
+
+    @Test
+    public void zrevrange() throws Exception {
+        String key = keyPrefix + "_ZREVRANGE";
+
+        executeSingleIntegerResult("ZADD " + key + " 1 \"one\" 2 \"two\" 3 \"three\"");
+        List<String> results = executeStringResults("ZREVRANGE " + key + " 0 -1");
+        assertEquals(3, results.size());
+        assertEquals("three", results.get(0));
+        assertEquals("two", results.get(1));
+        assertEquals("one", results.get(2));
+
+        delete(key);
+    }
+
+    @Test
+    public void zrevrangebylex() throws Exception {
+        String key = keyPrefix + "_ZREVRANGEBYLEX";
+
+        executeSingleIntegerResult("ZADD " + key + " 0 a 0 b 0 c 0 d 0 e 0 f 0 g");
+        List<String> results = executeStringResults("ZREVRANGEBYLEX " + key + " [c -");
+        assertEquals(3, results.size());
+        assertEquals("c", results.get(0));
+        assertEquals("b", results.get(1));
+        assertEquals("a", results.get(2));
+
+        delete(key);
+    }
+
+    @Test
+    public void zrevrangebyscore() throws Exception {
+        String key = keyPrefix + "_ZREVRANGEBYSCORE";
+
+        executeSingleIntegerResult("ZADD " + key + " 1 \"one\" 2 \"two\" 3 \"three\"");
+        List<String> results = executeStringResults("ZREVRANGEBYSCORE " + key + " +inf -inf");
+        assertEquals(3, results.size());
+        assertEquals("three", results.get(0));
+        assertEquals("two", results.get(1));
+        assertEquals("one", results.get(2));
+
+        delete(key);
+    }
+
+    @Test
+    public void zrevrank() throws Exception {
+        String key = keyPrefix + "_ZREMRANGEBYSCORE";
+
+        executeSingleIntegerResult("ZADD " + key + " 1 \"one\" 2 \"two\" 3 \"three\"");
+        assertEquals(2, executeSingleIntegerResult("ZREVRANK " + key + " one"));
+        assertNull(executeSingleStringResult("ZREVRANK " + key + " four"));
+
+        delete(key);
+    }
+
+    @Test
+    public void zscan() throws Exception {
+        String key = keyPrefix + "_ZSCAN";
+
+        executeSingleStringResult("ZADD " + key + " 1 \"one\" 2 \"two\"");
+
+        List<String> results = executeStringResults("ZSCAN " + key + " 0");
+
+        //TODO: return values as multiple columns
+
+        assertEquals(4, results.size());
+        assertEquals("one", results.get(0));
+        assertEquals("1", results.get(1));
+        assertEquals("two", results.get(2));
+        assertEquals("2", results.get(3));
+
+        delete(key);
+    }
+
+    @Test
+    public void zscore() throws Exception {
+        String key = keyPrefix + "_ZSCORE";
+
+        executeSingleIntegerResult("ZADD " + key + " 1 \"one\"");
+        assertEquals(1, executeSingleIntegerResult("ZSCORE " + key + " one"));
+
+        delete(key);
+    }
+
+    @Test
+    public void zunionstore() throws Exception {
+        String key = keyPrefix + "_ZUNIONSTORE";
+
+        executeSingleIntegerResult("ZADD " + key + "1 1 \"one\"");
+        executeSingleIntegerResult("ZADD " + key + "2 2 \"one\"");
+        assertEquals(1, executeSingleIntegerResult("ZUNIONSTORE " + key + "OUT" + " 2 " + key + "1 " + key + "2"));
+
+        delete(key + 1);
+        delete(key + 2);
+        delete(key + "OUT");
     }
 
     private void execute(final String command) throws Exception {
