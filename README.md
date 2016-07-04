@@ -208,8 +208,8 @@ The following is the list of currently supported statements:
 | SCRIPT FLUSH | :x: |
 | SCRIPT KILL | :x: |
 | SCRIPT LOAD | :x: |
-| SDIFF | :x: |
-| SDIFFSTORE | :x: |
+| SDIFF | :white_check_mark: |
+| SDIFFSTORE | :white_check_mark: |
 | SELECT | :white_check_mark: |
 | SET | :white_check_mark: |
 | SETBIT | :white_check_mark: |
@@ -222,17 +222,17 @@ The following is the list of currently supported statements:
 | SISMEMBER | :white_check_mark: |
 | SLAVEOF | :x: |
 | SLOWLOG | :x: |
-| SMEMBERS | :x: |
-| SMOVE | :x: |
+| SMEMBERS | :white_check_mark: |
+| SMOVE | :white_check_mark: |
 | SORT | :white_check_mark: |
-| SPOP | :x: |
-| SRANDMEMBER | :x: |
+| SPOP | :white_check_mark: |
+| SRANDMEMBER | :white_check_mark: |
 | SREM | :white_check_mark: |
-| SSCAN | :x: |
+| SSCAN | :white_check_mark: |
 | STRLEN | :x: |
 | SUBSCRIBE | :x: |
-| SUNION | :x: |
-| SUNIONSTORE | :x: |
+| SUNION | :white_check_mark: |
+| SUNIONSTORE | :white_check_mark: |
 | SYNC | :x: |
 | TIME | :x: |
 | TTL | :white_check_mark: |

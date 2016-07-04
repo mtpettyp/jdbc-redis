@@ -1,8 +1,11 @@
 package br.com.svvs.jdbc.redis;
 
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -1001,6 +1004,150 @@ public class CommandsTest {
         delete(key + 1);
         delete(key + 2);
         delete(key + "OUT");
+    }
+
+    @Test
+    public void sadd() throws Exception {
+        String key = keyPrefix + "_SADD";
+
+        assertEquals(1, executeSingleIntegerResult("SADD " + key + " \"Hello\""));
+
+        delete(key);
+    }
+
+    @Test
+    public void scard() throws Exception {
+        String key = keyPrefix + "_SCARD";
+
+        executeSingleIntegerResult("SADD " + key + " \"Hello\"");
+        executeSingleIntegerResult("SADD " + key + " \"World\"");
+        assertEquals(2, executeSingleIntegerResult("SCARD " + key));
+
+        delete(key);
+    }
+
+    @Test
+    public void sdiff() throws Exception {
+        String key = keyPrefix + "_SDIFF";
+
+        executeSingleIntegerResult("SADD " + key + "1 \"a\"");
+        executeSingleIntegerResult("SADD " + key + "1 \"b\"");
+        executeSingleIntegerResult("SADD " + key + "1 \"c\"");
+        executeSingleIntegerResult("SADD " + key + "2 \"c\"");
+        executeSingleIntegerResult("SADD " + key + "2 \"d\"");
+        executeSingleIntegerResult("SADD " + key + "2 \"e\"");
+        List<String> results = executeStringResults("SDIFF " + key + "1 " + key + "2");
+
+        assertEquals(2, results.size());
+        assertTrue(results.contains("a"));
+        assertTrue(results.contains("b"));
+
+        delete(key + 1);
+        delete(key + 2);
+    }
+
+    @Test
+    public void sdiffstore() throws Exception {
+        String key = keyPrefix + "_SDIFFSTORE";
+
+        executeSingleIntegerResult("SADD " + key + "1 \"a\"");
+        executeSingleIntegerResult("SADD " + key + "1 \"b\"");
+        executeSingleIntegerResult("SADD " + key + "1 \"c\"");
+        executeSingleIntegerResult("SADD " + key + "2 \"c\"");
+        executeSingleIntegerResult("SADD " + key + "2 \"d\"");
+        executeSingleIntegerResult("SADD " + key + "2 \"e\"");
+        assertEquals(2, executeSingleIntegerResult("SDIFFSTORE " + key + " " + key + "1 " + key + "2"));
+
+        delete(key);
+        delete(key + 1);
+        delete(key + 2);
+    }
+
+    @Test
+    public void sinter() throws Exception {
+        String key = keyPrefix + "_SINTER";
+
+        executeSingleIntegerResult("SADD " + key + "1 \"a\"");
+        executeSingleIntegerResult("SADD " + key + "1 \"b\"");
+        executeSingleIntegerResult("SADD " + key + "1 \"c\"");
+        executeSingleIntegerResult("SADD " + key + "2 \"c\"");
+        executeSingleIntegerResult("SADD " + key + "2 \"d\"");
+        executeSingleIntegerResult("SADD " + key + "2 \"e\"");
+        List<String> results = executeStringResults("SINTER " + key + "1 " + key + "2");
+
+        assertEquals(1, results.size());
+        assertEquals("c", results.get(0));
+
+        delete(key + 1);
+        delete(key + 2);
+    }
+
+    @Test
+    public void sinterstore() throws Exception {
+        String key = keyPrefix + "_SINTERSTORE";
+
+        executeSingleIntegerResult("SADD " + key + "1 \"a\"");
+        executeSingleIntegerResult("SADD " + key + "1 \"b\"");
+        executeSingleIntegerResult("SADD " + key + "1 \"c\"");
+        executeSingleIntegerResult("SADD " + key + "2 \"c\"");
+        executeSingleIntegerResult("SADD " + key + "2 \"d\"");
+        executeSingleIntegerResult("SADD " + key + "2 \"e\"");
+        assertEquals(1, executeSingleIntegerResult("SINTERSTORE " + key + " " + key + "1 " + key + "2"));
+
+        delete(key);
+        delete(key + 1);
+        delete(key + 2);
+    }
+
+    @Test
+    public void sismember() throws Exception {
+        String key = keyPrefix + "_SISMEMBER";
+
+        executeSingleIntegerResult("SADD " + key + " one");
+        assertEquals(1, executeSingleIntegerResult("SISMEMBER " + key + " one"));
+        assertEquals(0, executeSingleIntegerResult("SISMEMBER " + key + " two"));
+
+        delete(key);
+    }
+
+    @Test
+    public void smembers() throws Exception {
+        String key = keyPrefix + "_SMEMBERS";
+
+        executeSingleIntegerResult("SADD " + key + " Hello");
+        executeSingleIntegerResult("SADD " + key + " World");
+        List<String> results = executeStringResults("SMEMBERS " + key);
+
+        assertEquals(2, results.size());
+        assertTrue(results.contains("Hello"));
+        assertTrue(results.contains("World"));
+
+        delete(key);
+    }
+
+    @Test
+    public void smove() throws Exception {
+        String key = keyPrefix + "_SMOVE";
+
+        executeSingleIntegerResult("SADD " + key + "1 \"one\"");
+        executeSingleIntegerResult("SADD " + key + "1 \"two\"");
+        executeSingleIntegerResult("SADD " + key + "2 \"three\"");
+        assertEquals(1, executeSingleIntegerResult("SMOVE " + key + "1 " + key + "2 two"));
+
+        delete(key + 1);
+        delete(key + 2);
+    }
+
+    @Test
+    public void spop() throws Exception {
+        String key = keyPrefix + "_SPOP";
+
+        executeSingleIntegerResult("SADD " + key + " one");
+        executeSingleIntegerResult("SADD " + key + " two");
+        executeSingleIntegerResult("SADD " + key + " three");
+        assertThat(executeSingleStringResult("SPOP " + key),  anyOf(is("one"), is("two"), is("three")));
+
+        delete(key);
     }
 
     private void execute(final String command) throws Exception {
