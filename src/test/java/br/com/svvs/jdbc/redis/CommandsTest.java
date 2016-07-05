@@ -1150,6 +1150,39 @@ public class CommandsTest {
         delete(key);
     }
 
+    @Test
+    public void unwatch() throws Exception {
+        assertEquals("OK", executeSingleStringResult("UNWATCH"));
+    }
+
+    @Test
+    public void watch() throws Exception {
+        String key = keyPrefix + "_WATCH";
+
+        assertEquals("OK", executeSingleStringResult("WATCH " + key));
+
+        delete(key);
+    }
+
+    @Test
+    public void time() throws Exception {
+
+        //TODO: convert the response into a java datetime
+        List<Integer> results = executeIntegerResults("TIME");
+        assertEquals(2, results.size());
+
+    }
+
+    @Test
+    public void strlen() throws Exception {
+        String key = keyPrefix + "_STRLEN";
+
+        createValue(key, "\"Hello world\"");
+        assertEquals(11, executeSingleIntegerResult("STRLEN " + key));
+
+        delete(key);
+    }
+
     private void execute(final String command) throws Exception {
         conn.createStatement().execute(command);
     }
