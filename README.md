@@ -73,9 +73,9 @@ The following is the list of currently supported statements:
 | BITFIELD | :white_check_mark: |
 | BITOP | :white_check_mark: |
 | BITPOS | :white_check_mark: |
-| BLPOP | :x: |
-| BRPOP | :x: |
-| BRPOPLPUSH | :x: |
+| BLPOP | :white_check_mark: |
+| BRPOP | :white_check_mark: |
+| BRPOPLPUSH | :white_check_mark: |
 | CLIENT GETNAME | :x: |
 | CLIENT KILL | :x: |
 | CLIENT LIST | :x: |
@@ -157,11 +157,11 @@ The following is the list of currently supported statements:
 | KEYS | :white_check_mark: |
 | LASTSAVE | :white_check_mark: |
 | LINDEX | :white_check_mark: |
-| LINSERT | :x: |
+| LINSERT | :white_check_mark: |
 | LLEN | :white_check_mark: |
 | LPOP | :white_check_mark: |
 | LPUSH | :white_check_mark: |
-| LPUSHX | :x: |
+| LPUSHX | :white_check_mark: |
 | LRANGE | :white_check_mark: |
 | LREM | :white_check_mark: |
 | LSET | :white_check_mark: |
@@ -196,9 +196,9 @@ The following is the list of currently supported statements:
 | RESTORE | :x: |
 | ROLE | :x: |
 | RPOP | :white_check_mark: |
-| RPOPLPUSH | :x: |
+| RPOPLPUSH | :white_check_mark: |
 | RPUSH | :white_check_mark: |
-| RPUSHX | :x: |
+| RPUSHX | :white_check_mark: |
 | SADD | :white_check_mark: |
 | SAVE | :white_check_mark: |
 | SCAN | :white_check_mark: |
