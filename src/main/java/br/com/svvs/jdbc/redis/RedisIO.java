@@ -4,7 +4,7 @@ import java.io.IOException;
 
 public interface RedisIO {
 	
-	String sendRaw(String command) throws IOException;
+	Object sendRaw(String command) throws IOException, RedisResultException;
 
 	void close() throws IOException;
 }

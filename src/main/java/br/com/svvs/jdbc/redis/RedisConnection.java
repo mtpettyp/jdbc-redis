@@ -68,7 +68,7 @@ public class RedisConnection implements java.sql.Connection {
         try {
             io.sendRaw(RedisCommand.QUIT.toString() + "\r\n");
             io.close();
-        } catch (IOException e) {
+        } catch (IOException | RedisResultException e) {
             throw new SQLException(e);
         }
     }
@@ -81,7 +81,7 @@ public class RedisConnection implements java.sql.Connection {
         checkConnection();
         try {
             io.sendRaw(RedisCommand.SAVE.toString() + "\r\n");
-        } catch (IOException e) {
+        } catch (IOException | RedisResultException e) {
             throw new SQLException(e);
         }
     }
@@ -352,13 +352,13 @@ public class RedisConnection implements java.sql.Connection {
         throw new SQLFeatureNotSupportedException("unwrap");
     }
 
-    protected String msgToServer(String redisMsg) throws SQLException {
+    protected Object msgToServer(String redisMsg) throws SQLException {
 
         checkConnection(); // check if we can send the message.
 
         try {
             return io.sendRaw(redisMsg);
-        } catch (IOException e) {
+        } catch (IOException | RedisResultException e) {
             isClosed = true;
             throw new SQLException(e.getMessage());
         }
