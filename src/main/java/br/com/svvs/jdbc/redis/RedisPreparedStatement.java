@@ -54,7 +54,8 @@ public class RedisPreparedStatement extends RedisAbstractStatement implements Pr
         int idx = 1;
         while(this.sql.indexOf("?") > 1) {
             try {
-                this.sql = this.sql.replaceFirst("\\Q\u003F\\E", this.parameters.get(Integer.valueOf(idx)));
+                final String parameter = this.parameters.get(Integer.valueOf(idx));
+                this.sql = this.sql.replaceFirst("\\Q\u003F\\E", parameter==null ? "null" : parameter);
             } catch(IndexOutOfBoundsException e) {
                 throw new SQLException("Can't find defined parameter for position: " + idx);
             }
