@@ -26,6 +26,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.util.regex.Matcher.quoteReplacement;
+
 public class RedisPreparedStatement extends RedisAbstractStatement implements PreparedStatement {
 
     private Map<Integer,String> parameters = new HashMap<Integer,String>();
@@ -55,7 +57,7 @@ public class RedisPreparedStatement extends RedisAbstractStatement implements Pr
         while(this.sql.indexOf("?") > 1) {
             try {
                 final String parameter = this.parameters.get(Integer.valueOf(idx));
-                this.sql = this.sql.replaceFirst("\\Q\u003F\\E", parameter==null ? "null" : parameter);
+                this.sql = this.sql.replaceFirst("\\Q\u003F\\E", parameter==null ? "null" : quoteReplacement(parameter));
             } catch(IndexOutOfBoundsException e) {
                 throw new SQLException("Can't find defined parameter for position: " + idx);
             }
