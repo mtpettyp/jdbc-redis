@@ -1,7 +1,8 @@
 package br.com.svvs.jdbc.redis;
 
+import br.com.svvs.jdbc.redis.response.RedisInputStream;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -9,31 +10,20 @@ import java.net.UnknownHostException;
 public class RedisSocketIO implements RedisIO {
 	
 	private Socket socket = null;
-	private OutputStreamWriter toServerSocket   = null;
-	private InputStreamReader  fromServerSocket = null;
+	private OutputStreamWriter outputStreamWriter = null;
+	private RedisInputStream inputStream = null;
 	
 	public RedisSocketIO(String host, int port) throws UnknownHostException, IOException {	
 		
 		this.socket = new Socket(host, port);
-		
-		this.toServerSocket   = new OutputStreamWriter(this.socket.getOutputStream());
-		this.fromServerSocket = new InputStreamReader(this.socket.getInputStream());
+		this.outputStreamWriter = new OutputStreamWriter(this.socket.getOutputStream());
+		this.inputStream = new RedisInputStream(socket.getInputStream());
 	}
-	
-	@Override
-	public String sendRaw(String command) throws IOException {
-		
-		this.toServerSocket.write(command.toCharArray());
-		this.toServerSocket.flush();
-		
-		StringBuilder sb = new StringBuilder();
-		
-		while(this.fromServerSocket.ready()  || sb.length() == 0) {
-			char c = (char) this.fromServerSocket.read();
-			sb.append((char) c);
-		}
-		
-		return sb.toString();
+
+	public Object sendRaw(String command) throws IOException, RedisResultException {
+		this.outputStreamWriter.write(command.toCharArray());
+		this.outputStreamWriter.flush();
+		return RESPDecoder.decode(inputStream);
 	}
 
 	@Override

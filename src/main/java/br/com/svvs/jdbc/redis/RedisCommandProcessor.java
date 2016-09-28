@@ -12,11 +12,8 @@ public final class RedisCommandProcessor {
             throws SQLException, RedisParseException, RedisResultException {
 
         RedisCommand command = extractCommand(statement);
-
-        String response = connection.msgToServer(statement + "\r\n");
-        Object respResponse = RESPDecoder.decode(response);
-
-        return command.getResponse().processResponse(connection, statement, respResponse);
+        Object response = connection.msgToServer(statement + "\r\n");
+        return command.getResponse().processResponse(connection, statement, response);
     }
 
 

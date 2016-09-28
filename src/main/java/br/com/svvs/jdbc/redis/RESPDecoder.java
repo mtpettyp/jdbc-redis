@@ -1,113 +1,79 @@
 package br.com.svvs.jdbc.redis;
 
-import java.nio.CharBuffer;
+import br.com.svvs.jdbc.redis.response.RedisInputStream;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class RESPDecoder {
+public class RESPDecoder {
 
-    private static final char RESP_SIMPLE_STRING = '+';
-    private static final char RESP_ERROR = '-';
-    private static final char RESP_INTEGER = ':';
-    private static final char RESP_BULK_STRING = '$';
-    private static final char RESP_ARRAY = '*';
+    private static final byte RESP_SIMPLE_STRING = '+';
+    private static final byte RESP_ERROR = '-';
+    private static final byte RESP_INTEGER = ':';
+    private static final byte RESP_BULK_STRING = '$';
+    private static final byte RESP_ARRAY = '*';
 
-    private RESPDecoder() {
-    }
-
-    public static Object decode(final String response) throws RedisResultException {
-
-        if (response == null || response.length() == 0) {
-            return null;
-        }
-
-        return decode(CharBuffer.wrap(response, 0, response.length()));
-    }
-
-    private static Object decode(final CharBuffer buffer) throws RedisResultException {
-
-        char type = buffer.get();
-
+    public static Object decode(final RedisInputStream is) throws RedisResultException, IOException {
+        final byte type = is.readByte();
         switch(type) {
-        case RESP_SIMPLE_STRING:
-        case RESP_INTEGER:
-            return parseSimpleString(buffer);
-        case RESP_BULK_STRING:
-            return parseBulkString(buffer);
-        case RESP_ERROR:
-            return parseError(buffer);
-        case RESP_ARRAY:
-            return parseArray(buffer);
-        default:
-            return null;
+            case RESP_SIMPLE_STRING:
+            case RESP_INTEGER:
+                return parseSimpleString(is);
+            case RESP_BULK_STRING:
+                return parseBulkString(is);
+            case RESP_ERROR:
+                return parseError(is);
+            case RESP_ARRAY:
+                return parseArray(is);
+            default:
+                return null;
         }
     }
 
-
-    private static String parseSimpleString(final CharBuffer buffer) {
-        return readToTerminator(buffer);
+    private static String parseSimpleString(final RedisInputStream is) throws IOException {
+        return is.readLine();
     }
 
-    private static String parseBulkString(final CharBuffer buffer) {
-        int length = parseLength(buffer);
+    private static String parseBulkString(final RedisInputStream is) throws IOException {
 
-        if (length >= 0) {
-
-            char[] data = new char[length];
-            buffer.get(data);
-
-            buffer.get();
-            buffer.get();
-
-            return new String(data);
-        } else {
+        final int length = is.readIntCrLf();
+        if (length == -1) {
             return null;
         }
 
+        final byte[] read = new byte[length];
+        int offset = 0;
+        while (offset < length) {
+            final int size = is.read(read, offset, (length - offset));
+            if (size == -1) throw new IOException("It seems like server has closed the connection.");
+            offset += size;
+        }
+
+        // read 2 more bytes for the command delimiter
+        is.readByte();
+        is.readByte();
+
+        return new String(read);
     }
 
-    private static Object parseArray(final CharBuffer buffer) throws RedisResultException {
-        int length = parseLength(buffer);
+    private static Object parseArray(final RedisInputStream is) throws RedisResultException, IOException {
 
-        if (length >= 0) {
-            List<Object> array = new ArrayList<>();
-
-            for (int i = 0; i < length; i++) {
-                array.add(decode(buffer));
-            }
-
-            return array.toArray();
-        } else {
+        final int num = is.readIntCrLf();
+        if (num == -1) {
             return null;
         }
-    }
-
-
-    private static String parseError(final CharBuffer buffer) throws RedisResultException {
-        throw new RedisResultException(readToTerminator(buffer));
-    }
-
-    private static String readToTerminator(final CharBuffer buffer) {
-        char c;
-        StringBuilder response = new StringBuilder();
-        while ((c = buffer.get()) != '\r') {
-            response.append(c);
+        final List<Object> result = new ArrayList<Object>(num);
+        for (int i = 0; i < num; i++) {
+            result.add(decode(is));
         }
-
-      //TODO: check that is '\n'
-        buffer.get();
-
-        return response.toString();
+        return result.toArray();
     }
 
-    private static int parseLength(final CharBuffer buffer) {
-        int length;
-        try {
-            length = Integer.valueOf(readToTerminator(buffer));
-        } catch (Exception e) {
-            length = -1;
-        }
 
-        return length;
+    private static String parseError(final RedisInputStream is) throws RedisResultException, IOException {
+        String message = is.readLine();
+        throw new RedisResultException(message);
     }
+
 }
