@@ -29,13 +29,14 @@ public class RedisConnection implements java.sql.Connection {
     private boolean isClosed = true;
     private boolean autoCommit = true;
 
-    public RedisConnection(final RedisIO io, final Properties info) throws SQLException {
+    public RedisConnection(final RedisIO io, final int db, final Properties info) throws SQLException {
 
         if (io == null) {
             throw new RuntimeException("Null RedisIO handler.");
         }
         this.io = io;
-
+        isClosed = false;
+        
         // we got a connection, let's try to authenticate
         if(info != null && info.getProperty(PROPERTY_PASSWORD) != null &&
                 info.getProperty(PROPERTY_PASSWORD).length() > 0) {
@@ -48,8 +49,17 @@ public class RedisConnection implements java.sql.Connection {
                 throw new SQLException("Could not authenticate with Redis.", e);
             }
         }
-
-        isClosed = false;
+        
+        if(db > 0){
+        	try {
+                RedisCommandProcessor.runCommand(this, RedisCommand.SELECT + " " + db);
+            } catch (RedisParseException e) {
+                throw new SQLException(e);
+            } catch (RedisResultException e) {
+                throw new SQLException("Could not SELECT database " + db + ".", e);
+            }
+        }
+        
     }
 
     @Override

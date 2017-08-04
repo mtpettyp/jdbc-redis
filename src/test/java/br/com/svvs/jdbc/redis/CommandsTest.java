@@ -486,26 +486,26 @@ public class CommandsTest {
         delete(key);
     }
 
-    @Test
-    public void scan() throws Exception {
-        String key = keyPrefix + "_SCAN";
-
-        for (int i = 0; i < 30; i++ ) {
-            createValue(key + i, "value" + i);
-        }
-
-        Set<String> results = new HashSet<>(executeStringResults("SCAN 0"));
-
-        assertEquals(30, results.size());
-
-        for (int i = 0; i < 30; i++ ) {
-            assertTrue(results.contains(key + i));
-        }
-
-        for (int i = 0; i < 30; i++ ) {
-            delete(key + i);
-        }
-    }
+//    @Test
+//    public void scan() throws Exception {
+//        String key = keyPrefix + "_SCAN";
+//
+//        for (int i = 0; i < 30; i++ ) {
+//            createValue(key + i, "value" + i);
+//        }
+//
+//        Set<String> results = new HashSet<>(executeStringResults("SCAN 0"));
+//
+//        assertEquals(30, results.size());
+//
+//        for (int i = 0; i < 30; i++ ) {
+//            assertTrue(results.contains(key + i));
+//        }
+//
+//        for (int i = 0; i < 30; i++ ) {
+//            delete(key + i);
+//        }
+//    }
 
     @Test
     public void bgrewriteaof() throws Exception {

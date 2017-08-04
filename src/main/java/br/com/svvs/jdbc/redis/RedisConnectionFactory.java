@@ -21,7 +21,7 @@ public class RedisConnectionFactory {
 			throw new SQLException("Couldn't connect ("+ e.getMessage() + ")");
 		}
 		
-		Connection conn = new RedisConnection(io, info);	
+		Connection conn = new RedisConnection(io, dbnb, info);	
 		return conn;
 	}
 
