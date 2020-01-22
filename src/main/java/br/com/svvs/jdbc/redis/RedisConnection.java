@@ -7,7 +7,6 @@ import java.sql.CallableStatement;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
 import java.sql.NClob;
 import java.sql.PreparedStatement;
 import java.sql.SQLClientInfoException;
@@ -29,9 +28,6 @@ public class RedisConnection implements java.sql.Connection {
     private RedisIO io = null;
     private boolean isClosed = true;
     private boolean autoCommit = true;
-    private String host = "";
-    private int port = 0;
-    private int db = 0;
 
 
     public RedisConnection(final RedisIO io, final int db, final Properties info) throws SQLException {
@@ -40,9 +36,6 @@ public class RedisConnection implements java.sql.Connection {
             throw new RuntimeException("Null RedisIO handler.");
         }
         this.io = io;
-        this.host = info.getProperty("host");
-        this.port = Integer.valueOf(info.getProperty("port"));
-        this.db = db;
         isClosed = false;
         
         // we got a connection, let's try to authenticate
@@ -96,7 +89,6 @@ public class RedisConnection implements java.sql.Connection {
      */
     @Override
     public void commit() throws SQLException {
-        checkConnection();
         try {
             io.sendRaw(RedisCommand.SAVE.toString() + "\r\n");
         } catch (IOException | RedisResultException e) {
@@ -159,7 +151,6 @@ public class RedisConnection implements java.sql.Connection {
 
     @Override
     public String getCatalog() throws SQLException {
-        checkConnection(); // as API spec says throw exception if conn is closed.
         return null;
     }
 
@@ -370,32 +361,12 @@ public class RedisConnection implements java.sql.Connection {
         throw new SQLFeatureNotSupportedException("unwrap");
     }
 
-    protected Object msgToServer(String redisMsg) throws SQLException {
-
-        //checkConnection(); // check if we can send the message.
-
-    	reconnect();
-    	
+    protected Object msgToServer(String redisMsg) throws SQLException {    	
         try {
             return io.sendRaw(redisMsg);
         } catch (IOException | RedisResultException e) {
             isClosed = true;
             throw new SQLException(e.getMessage());
-        }
-    }
-    
-    private void reconnect() throws SQLException {
-    	try {
-			DriverManager.getConnection("jdbc:redis://"+host+":"+port+"/"+db);
-		} catch (SQLException e) {
-	         isClosed = true;
-	         throw new SQLException(e.getMessage());
-		}
-    }
-    
-    private void checkConnection() throws SQLException {
-        if(isClosed()) {
-            throw new SQLException("Connection with Redis is closed");
         }
     }
 }
