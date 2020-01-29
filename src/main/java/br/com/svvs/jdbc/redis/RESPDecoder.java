@@ -15,7 +15,7 @@ public class RESPDecoder {
     private static final byte RESP_ARRAY = '*';
 
     public static Object decode(final RedisInputStream is) throws RedisResultException, IOException {
-        final byte type = is.readByte();
+        final byte type = is.readByte(); 
         switch(type) {
             case RESP_SIMPLE_STRING:
             case RESP_INTEGER:
@@ -41,7 +41,7 @@ public class RESPDecoder {
         if (length == -1) {
             return null;
         }
-
+        
         final byte[] read = new byte[length];
         int offset = 0;
         while (offset < length) {
@@ -58,7 +58,6 @@ public class RESPDecoder {
     }
 
     private static Object parseArray(final RedisInputStream is) throws RedisResultException, IOException {
-
         final int num = is.readIntCrLf();
         if (num == -1) {
             return null;

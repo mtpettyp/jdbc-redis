@@ -28,28 +28,56 @@ public class RedisConnection implements java.sql.Connection {
     private RedisIO io = null;
     private boolean isClosed = true;
     private boolean autoCommit = true;
+    private int db = 0;
+	private int maxRetries = 3;
+	private int maxTimeout = 3000;
+	private Properties info = null;
 
-    public RedisConnection(final RedisIO io, final Properties info) throws SQLException {
+
+    public RedisConnection(final RedisIO io, final int db, final Properties info) throws SQLException {
 
         if (io == null) {
             throw new RuntimeException("Null RedisIO handler.");
         }
         this.io = io;
-
-        // we got a connection, let's try to authenticate
-        if(info != null && info.getProperty(PROPERTY_PASSWORD) != null &&
-                info.getProperty(PROPERTY_PASSWORD).length() > 0) {
-            try {
-                RedisCommandProcessor.runCommand(this, RedisCommand.AUTH.toString() + " "
-                        + info.getProperty(PROPERTY_PASSWORD));
-            } catch (RedisParseException e) {
-                throw new SQLException(e);
-            } catch (RedisResultException e) {
-                throw new SQLException("Could not authenticate with Redis.", e);
-            }
-        }
-
         isClosed = false;
+        this.db = db;
+        this.info = (Properties)info.clone();
+        
+        initRedis();
+        
+    }
+    
+    /**
+     * Initialize Redis Connection (Authentication and DB Selection)
+     *  
+     * @author flichtenegger
+     * @throws SQLException 
+     */
+    private void initRedis() throws SQLException {
+		// we got a connection, let's try to authenticate
+		if(info != null && info.getProperty(PROPERTY_PASSWORD) != null &&
+		        info.getProperty(PROPERTY_PASSWORD).length() > 0) {
+		    try {
+		        RedisCommandProcessor.runCommand(this, RedisCommand.AUTH.toString() + " "
+		                + info.getProperty(PROPERTY_PASSWORD));
+		    } catch (RedisParseException e) {
+		        throw new SQLException(e);
+		    } catch (RedisResultException e) {
+		        throw new SQLException("Could not authenticate with Redis.", e);
+		    }
+		}
+		
+		
+		if(db > 0){
+			try {
+		        RedisCommandProcessor.runCommand(this, RedisCommand.SELECT + " " + db);
+		    } catch (RedisParseException e) {
+		        throw new SQLException(e);
+		    } catch (RedisResultException e) {
+		        throw new SQLException("Could not SELECT database " + db + ".", e);
+		    }
+		}
     }
 
     @Override
@@ -78,7 +106,6 @@ public class RedisConnection implements java.sql.Connection {
      */
     @Override
     public void commit() throws SQLException {
-        checkConnection();
         try {
             io.sendRaw(RedisCommand.SAVE.toString() + "\r\n");
         } catch (IOException | RedisResultException e) {
@@ -141,7 +168,6 @@ public class RedisConnection implements java.sql.Connection {
 
     @Override
     public String getCatalog() throws SQLException {
-        checkConnection(); // as API spec says throw exception if conn is closed.
         return null;
     }
 
@@ -351,26 +377,39 @@ public class RedisConnection implements java.sql.Connection {
     public <T> T unwrap(Class<T> arg0) throws SQLException {
         throw new SQLFeatureNotSupportedException("unwrap");
     }
-
-    protected Object msgToServer(String redisMsg) throws SQLException {
-
-        checkConnection(); // check if we can send the message.
-
-        try {
-            return io.sendRaw(redisMsg);
-        } catch (IOException | RedisResultException e) {
-            isClosed = true;
-            throw new SQLException(e.getMessage());
-        }
+    
+    protected Object msgToServer(String redisMsg) throws SQLException {    	
+		Object objRet = null;
+    	int iCounter = 0;
+		
+		while(iCounter < maxRetries) {
+			try {
+				objRet =  io.sendRaw(redisMsg);
+				break;
+			}
+			catch(Exception e) {
+				System.out.println("Connection to redis is closed: "+e.getMessage());
+				try {
+					io.reconnect();
+					initRedis();
+				}
+				catch(Exception io) {
+					System.out.println("Problem connecting to redis: "+io.getMessage());
+				}
+    			try {
+    				Thread.sleep(maxTimeout);
+    			}
+    			catch(InterruptedException ie) {
+    				System.out.println("Could not interrupt thread: "+ie.getMessage());
+    			}
+			}
+			iCounter++;
+		}
+		
+		if (iCounter == maxRetries) {
+			throw new SQLException("Could not connect to redis");
+		}
+		
+		return objRet;
     }
-
-    private void checkConnection() throws SQLException {
-        if(isClosed()) {
-            throw new SQLException("Connection with Redis is closed");
-        }
-    }
-
-
-
-
 }

@@ -485,7 +485,7 @@ public class CommandsTest {
         assertEquals("value1", retrieveValue(key));
         delete(key);
     }
-
+    
     @Test
     public void scan() throws Exception {
         String key = keyPrefix + "_SCAN";
@@ -505,7 +505,7 @@ public class CommandsTest {
         for (int i = 0; i < 30; i++ ) {
             delete(key + i);
         }
-    }
+}
 
     @Test
     public void bgrewriteaof() throws Exception {
