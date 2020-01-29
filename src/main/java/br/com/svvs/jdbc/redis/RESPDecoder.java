@@ -15,7 +15,7 @@ public class RESPDecoder {
     private static final byte RESP_ARRAY = '*';
 
     public static Object decode(final RedisInputStream is) throws RedisResultException, IOException {
-        final byte type = is.readByte();
+        final byte type = is.readByte(); 
         switch(type) {
             case RESP_SIMPLE_STRING:
             case RESP_INTEGER:

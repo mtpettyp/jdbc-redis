@@ -1,11 +1,11 @@
 package br.com.svvs.jdbc.redis;
 
-import br.com.svvs.jdbc.redis.response.RedisInputStream;
-
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+
+import br.com.svvs.jdbc.redis.response.RedisInputStream;
 
 public class RedisSocketIO implements RedisIO {
 	
@@ -14,8 +14,6 @@ public class RedisSocketIO implements RedisIO {
 	private RedisInputStream inputStream = null;
 	private String host = null;
 	private int port = 0;
-	private int maxRetries = 3;
-	private int maxTimeout = 3000;
 	
 	public RedisSocketIO(String host, int port) throws UnknownHostException, IOException {	
 		this.host = host;
@@ -32,43 +30,15 @@ public class RedisSocketIO implements RedisIO {
 	
 	public Object sendRaw(String command) throws IOException, RedisResultException {
 		Object decode = null;
-		int iCounter = 0;
-		
-		while(iCounter < maxRetries) {
-			try {
-				this.outputStreamWriter.write(command.toCharArray());
-				this.outputStreamWriter.flush();
-				decode = RESPDecoder.decode(inputStream);
-				
-				if(decode != null)
-					break;
-			}
-			catch(Exception e) {
-				System.out.println("Connection to redis is closed");
-				try {
-					reconnectSocket();
-				}
-				catch(Exception io) {
-					System.out.println("Problem connecting to redis: "+io.getMessage());
-				}
-    			try {
-    				Thread.sleep(maxTimeout);
-    			}
-    			catch(InterruptedException ie) {
-    				System.out.println("Could not interrupt thread");
-    			}
-			}
-			iCounter++;
-		}
-		
-		if (iCounter == maxRetries) {
-			throw new IOException("Could not connect to redis");
-		}
-		
+
+		this.outputStreamWriter.write(command.toCharArray());
+		this.outputStreamWriter.flush();
+		decode = RESPDecoder.decode(inputStream);
+
 		return decode;
 	}
 	
-	public void reconnectSocket() throws UnknownHostException, IOException {
+	public void reconnect() throws UnknownHostException, IOException {
 		try {
 			System.out.println("Closing buffers and redis connection");
 			close();
@@ -78,25 +48,13 @@ public class RedisSocketIO implements RedisIO {
 		}
 		init();
 	}
-
+	
 	@Override
 	public void close() throws IOException {
-		if(inputStream != null)
-		{
-			this.inputStream.close();
-			inputStream = null;
-		}
-		
-		if(outputStreamWriter != null)
-		{
-			this.outputStreamWriter.close();
-			outputStreamWriter = null;
-		}
-		
 		if(socket != null)
-		{
+		{	
 			this.socket.close();
-			socket = null;
+			this.socket = null;
 		}
 	}
 }

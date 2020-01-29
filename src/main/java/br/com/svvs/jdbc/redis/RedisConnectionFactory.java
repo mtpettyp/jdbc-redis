@@ -21,8 +21,6 @@ public class RedisConnectionFactory {
 			throw new SQLException("Couldn't connect ("+ e.getMessage() + ")");
 		}
 		
-		info.setProperty("host", host);
-		info.setProperty("port", String.valueOf(port));
 		Connection conn = new RedisConnection(io, dbnb, info);	
 		return conn;
 	}
